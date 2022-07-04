@@ -6,13 +6,17 @@
  * @flow strict-local
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  Button,
   PermissionsAndroid,
   SafeAreaView,
   StyleSheet,
   Text,
+  TextInput,
+  ToastAndroid,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   useColorScheme,
   View,
 } from 'react-native';
@@ -21,23 +25,44 @@ import {NativeModules} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
   faCalculator,
+  faCog,
+  faCreditCard,
+  faEraser,
   faGasPump,
+  faKey,
+  faList,
+  faPhoneSlash,
   faPowerOff,
+  faSimCard,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from './Navbar';
+import {
+  faCreditCardAlt,
+  faFileText,
+  faListAlt,
+  faTrashAlt,
+} from '@fortawesome/free-regular-svg-icons';
+import Modal1 from './Modal1';
+import globals from './globals';
 
-const Main = ({navigation}) => {
+const Main = (props) => {
+  const {navigation, route} = props;
+  const phonenumber = route.params.phonenumber;
   const isDarkMode = useColorScheme() === 'dark';
-  const requestCameraPermission = async () => {
-    console.log('runm');
+  const [close, setClose] = useState(false);
+  const [modal, setModal] = useState(null);
+  const modalCloser = async () => {setClose(!close);};
+  const requestSMSPermission = async (phone, msg) => {
     try {
+      setClose(false);
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.SEND_SMS,
         {
-          title: 'Cool Photo Main Camera Permission',
+          title: 'Cool SMS Permission',
           message:
-            'Cool Photo Main needs access to your camera ' +
+            'Cool Photo Main needs access to your SMS ' +
             'so you can take awesome pictures.',
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
@@ -46,14 +71,16 @@ const Main = ({navigation}) => {
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         NativeModules.TAFAKORISMS.sendMsg(
-          '09357578808',
-          "I'm the best developer ever",
+          phone,
+          msg,
           (err, name) => {
             console.log(err, name);
           },
         );
+
+        ToastAndroid.show("پیام ارسال شد", ToastAndroid.SHORT)
       } else {
-        console.log('Camera permission denied');
+        console.log('SMS permission denied');
       }
     } catch (err) {
       console.warn(err);
@@ -69,6 +96,8 @@ const Main = ({navigation}) => {
     }
   };
 
+  let comp;
+
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@storage_Key');
@@ -80,9 +109,337 @@ const Main = ({navigation}) => {
     }
   };
 
+  //charge control
+  function chargeControl() {
+    const msg = "*1234*72#";
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center'
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      }
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>
+          آیا مایلید پیام ارسال شود؟
+        </Text>
+        <View style={styles.row}>
+        <TouchableOpacity onPress={() => requestSMSPermission(phonenumber, msg)}>
+          <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>ارسال</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={modalCloser}>
+          <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>انصراف</Text>
+          </View>
+        </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  //disconnect calling
+  function disconnectCalling() {
+    const msg = "*1234*70#";
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center'
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      }
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>
+          آیا مایلید پیام ارسال شود؟
+        </Text>
+        <View style={styles.row}>
+        <TouchableOpacity onPress={() => requestSMSPermission(phonenumber, msg)}>
+          <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>ارسال</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={modalCloser}>
+          <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>انصراف</Text>
+          </View>
+        </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+
+//on
+function powerswitchON() {
+  const msg = "*1234*61#";
+  const styles = StyleSheet.create({
+    container: {
+      flexDirection: 'column',
+      justifyContent: 'space-around',
+      flex: 1,
+    },
+    btn: {
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderRadius: 10,
+      width: 100,
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-around'
+    },
+    text: {
+      fontFamily: 'Vazir-Medium',
+      textAlign: 'center',
+      fontSize: 16,
+    }
+  });
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>
+        آیا مایلید پیام ارسال شود؟
+      </Text>
+      <View style={styles.row}>
+      <TouchableOpacity onPress={() => requestSMSPermission(phonenumber, msg)}>
+        <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+          <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>ارسال</Text>
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={modalCloser}>
+        <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+          <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>انصراف</Text>
+        </View>
+      </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+//off
+function powerswitchOFF() {
+  const msg = "*1234*60#";
+  const styles = StyleSheet.create({
+    container: {
+      flexDirection: 'column',
+      justifyContent: 'space-around',
+      flex: 1,
+    },
+    btn: {
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderRadius: 10,
+      width: 100,
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-around'
+    },
+    text: {
+      fontFamily: 'Vazir-Medium',
+      textAlign: 'center',
+      fontSize: 16,
+    }
+  });
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>
+        آیا مایلید پیام ارسال شود؟
+      </Text>
+      <View style={styles.row}>
+      <TouchableOpacity onPress={() => requestSMSPermission(phonenumber, msg)}>
+        <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+          <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>ارسال</Text>
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={modalCloser}>
+        <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+          <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>انصراف</Text>
+        </View>
+      </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+  //add charge
+  function addCharge() {
+    const msg = chargeCode => `*1234*50#${chargeCode}#`;
+    const [chargecode, setchargecode] = useState(null)
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center'
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      input: {
+        backgroundColor: '#aaa2',
+         fontFamily: 'Vazir-Medium',
+         borderRadius: 10,
+         paddingHorizontal: 15
+      }
+    });
+
+    return (
+      <View style={styles.container}>
+        <TextInput keyboardType={"number-pad"} style={styles.input} onChangeText={text => setchargecode(text)} placeholder='کد شارژ'/>
+        <Text style={styles.text}>
+          آیا مایلید پیام ارسال شود؟
+        </Text>
+        <View style={styles.row}>
+        <TouchableOpacity onPress={() => requestSMSPermission(phonenumber, msg(chargecode))}>
+          <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>ارسال</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={modalCloser}>
+          <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>انصراف</Text>
+          </View>
+        </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+  //change password
+  function changePassword() {
+    const msg = password => `*1234*2#${password}#`;
+    const [password, setpassword] = useState(null)
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center'
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      input: {
+        backgroundColor: '#aaa2',
+         fontFamily: 'Vazir-Medium',
+         borderRadius: 10,
+         paddingHorizontal: 15
+      }
+    });
+
+    return (
+      <View style={styles.container}>
+        <TextInput keyboardType={"number-pad"} style={styles.input} onChangeText={text => setpassword(text)} placeholder='رمز جدید'/>
+        <Text style={styles.text}>
+          آیا مایلید پیام ارسال شود؟
+        </Text>
+        <View style={styles.row}>
+        <TouchableOpacity onPress={() => requestSMSPermission(phonenumber, msg(password))}>
+          <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>ارسال</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={modalCloser}>
+          <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>انصراف</Text>
+          </View>
+        </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+
+
+  
+
+
+  const components = {
+    chargeControl,
+    addCharge,
+    disconnectCalling,
+    powerswitchON,
+    powerswitchOFF,
+    changePassword,
+  }
+
   return (
     <>
       <Navbar />
+      {close && (
+        <Modal1 Component={components[modal]} close={modalCloser} />
+      )}
       <SafeAreaView
         style={{
           flex: 1,
@@ -91,100 +448,109 @@ const Main = ({navigation}) => {
           marginTop: 25,
         }}>
         <View style={styles.containerBox}>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              onPress={getData}
-              style={[styles.buttonSwitch, {backgroundColor: '#2AB461'}]}>
-              <FontAwesomeIcon icon={faPowerOff} size={60} color={'#eee'} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => storeData('HELLO')}
+        <TouchableWithoutFeedback
+             onPress={() => {modalCloser(); setModal('powerswitchON')}}
               style={{
                 marginVertical: 5,
               }}>
+          <View style={styles.buttonContainer}>
+            <View
+              style={[styles.buttonSwitch, {backgroundColor: '#2AB461'}]}>
+              <FontAwesomeIcon icon={faPowerOff} size={60} color={'#eee'} />
+            </View>
+            
               <Text style={{fontFamily: 'Vazir-Medium', fontSize: 16}}>
                 روشن
               </Text>
-            </TouchableOpacity>
           </View>
+            </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback
+              onPress={() => {modalCloser(); setModal('powerswitchOFF')}}
+              style={{
+                marginVertical: 5,
+              }}>
           <View style={styles.buttonContainer}>
             <View style={[styles.buttonSwitch, {backgroundColor: '#B42A33'}]}>
               <FontAwesomeIcon icon={faPowerOff} size={60} color={'#eee'} />
             </View>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Devices')}
-              style={{
-                marginVertical: 5,
-              }}>
+           
               <Text style={{fontFamily: 'Vazir-Medium', fontSize: 16}}>
                 خاموش
               </Text>
-            </TouchableOpacity>
           </View>
+            </TouchableWithoutFeedback>
         </View>
         <View style={styles.containerButtonsColumn}>
           <View style={styles.containerButtonsRow}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Profile')}
+            <View
+             
               style={styles.containerButtonsBtnContainer}>
-              <View style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faGasPump} size={26} color={'#2AB461'} />
-              </View>
-              <Text style={styles.text}>بررسی شارژ</Text>
-            </TouchableOpacity>
-            <View style={styles.containerButtonsBtnContainer}>
-              <View style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faGasPump} size={26} color={'#2AB461'} />
-              </View>
-              <Text style={styles.text}>sdsad</Text>
+              <TouchableOpacity   style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon icon={faList} size={26} color={'#2AB461'} />
+              </TouchableOpacity>
+              <Text style={styles.text}>خروجی رله‌ها</Text>
             </View>
             <View style={styles.containerButtonsBtnContainer}>
-              <View style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faGasPump} size={26} color={'#2AB461'} />
-              </View>
-              <Text style={styles.text}>sdsad</Text>
-            </View>
-          </View>
-
-          <View style={styles.containerButtonsRow}>
-            <View style={styles.containerButtonsBtnContainer}>
-              <View style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faGasPump} size={26} color={'#2AB461'} />
-              </View>
-              <Text style={styles.text}>sdsad</Text>
+              <TouchableOpacity onPress={() => {modalCloser(); setModal('addCharge')}} style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon
+                  icon={faCreditCardAlt}
+                  size={26}
+                  color={'#2AB461'}
+                />
+              </TouchableOpacity>
+              <Text style={styles.text}>افزایش شارژ</Text>
             </View>
             <View style={styles.containerButtonsBtnContainer}>
-              <View style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faGasPump} size={26} color={'#2AB461'} />
-              </View>
-              <Text style={styles.text}>sdsad</Text>
-            </View>
-            <View style={styles.containerButtonsBtnContainer}>
-              <View style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faGasPump} size={26} color={'#2AB461'} />
-              </View>
-              <Text style={styles.text}>شارژ</Text>
+              <TouchableOpacity onPress={() => {modalCloser(); setModal('chargeControl')}} style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon icon={faSimCard} size={26} color={'#2AB461'} />
+              </TouchableOpacity>
+              <Text style={styles.text}>کنترل شارژ</Text>
             </View>
           </View>
 
           <View style={styles.containerButtonsRow}>
             <View style={styles.containerButtonsBtnContainer}>
-              <View style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faGasPump} size={26} color={'#2AB461'} />
-              </View>
-              <Text style={styles.text}>sdsad</Text>
+              <TouchableOpacity onPress={() =>  {modalCloser(); setModal('changePassword')}} style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon icon={faKey} size={26} color={'#2AB461'} />
+              </TouchableOpacity>
+              <Text style={styles.text}>تغییر رمز دستگاه</Text>
             </View>
             <View style={styles.containerButtonsBtnContainer}>
               <View style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faGasPump} size={26} color={'#2AB461'} />
+                <FontAwesomeIcon icon={faTrash} size={26} color={'#2AB461'} />
               </View>
-              <Text style={styles.text}>sdsad</Text>
+              <Text style={styles.text}>حذف زون</Text>
+            </View>
+            <View  style={styles.containerButtonsBtnContainer}>
+              <TouchableOpacity onPress={() => {modalCloser(); setModal('disconnectCalling')}}  style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon
+                  icon={faPhoneSlash}
+                  size={26}
+                  color={'#2AB461'}
+                />
+              </TouchableOpacity>
+              <Text style={styles.text}>قطع شماره گیری</Text>
+            </View>
+          </View>
+
+          <View
+          
+            style={[styles.containerButtonsRow, {justifyContent: 'flex-end'}]}>
+            <View style={styles.containerButtonsBtnContainer}>
+              <TouchableOpacity onPress={() => navigation.navigate('AboutUs')} style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon
+                  icon={faFileText}
+                  size={26}
+                  color={'#2AB461'}
+                />
+              </TouchableOpacity>
+              <Text style={styles.text}>درباره ما</Text>
             </View>
             <View style={styles.containerButtonsBtnContainer}>
-              <View style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faGasPump} size={26} color={'#2AB461'} />
-              </View>
-              <Text style={styles.text}>تست</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Setting')} style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon icon={faCog} size={26} color={'#2AB461'} />
+              </TouchableOpacity>
+              <Text style={styles.text}>تنظیمات نرم افزار</Text>
             </View>
           </View>
         </View>

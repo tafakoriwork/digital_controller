@@ -6,6 +6,7 @@ import Setting from './ios/components/Setting';
 import Devices from './ios/components/Devices';
 import AddDevice from './ios/components/addDevice';
 import Locker from './ios/components/Locker';
+import AboutUs from './ios/components/aboutUs';
 
 const Stack = createNativeStackNavigator();
 
@@ -13,15 +14,15 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-      initialRouteName={Devices}
         screenOptions={{
           headerShown: false,
         }}>
         <Stack.Screen name="Devices" component={Devices} />
-        <Stack.Screen name="Profile" component={Setting} />
         <Stack.Screen name="Main" component={Main} />
         <Stack.Screen name="addDevice" component={AddDevice} />
         <Stack.Screen name="Locker" component={Locker} />
+        <Stack.Screen name="AboutUs" component={AboutUs} />
+        <Stack.Screen name="Setting" component={Setting} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   PermissionsAndroid,
@@ -21,58 +21,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from './Navbar';
 
 const Devices = ({navigation}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const requestCameraPermission = async () => {
-    console.log('runm');
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.SEND_SMS,
-        {
-          title: 'Cool Photo Devices Camera Permission',
-          message:
-            'Cool Photo Devices needs access to your camera ' +
-            'so you can take awesome pictures.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        NativeModules.TAFAKORISMS.sendMsg(
-          '09357578808',
-          "I'm the best developer ever",
-          (err, name) => {
-            console.log(err, name);
-          },
-        );
-      } else {
-        console.log('Camera permission denied');
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  };
-
-  const storeData = async value => {
-    try {
-      const jsonValue = value;
-      await AsyncStorage.setItem('@storage_Key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
-  };
-
+  const [_devices, setdevices] = useState([])
   const getData = async () => {
     try {
-      const value = await AsyncStorage.getItem('@storage_Key');
+      const value = await AsyncStorage.getItem('devices');
       if (value !== null) {
-        console.log(value);
+        return value;
       }
+      return "[]";
     } catch (e) {
       // error reading value
     }
   };
 
+  function removeItem(index) {
+    const devices = _devices;
+    devices.splice(index, 1);
+    AsyncStorage.setItem('devices', JSON.stringify(devices));
+    setdevices(devices);
+  }
+  useEffect(() => {
+    getData().then(devices => setdevices(JSON.parse(devices)));
+  }, [_devices])
+  
   return (
     <>
       <Navbar />
@@ -96,41 +67,35 @@ const Devices = ({navigation}) => {
             marginHorizontal: 25,
           }}></View>
         <View style={styles.devices}>
-          <View style={styles.deviceContainer}>
+          {_devices.length > 0 ? _devices.map((el, i) => {
+            return (
+            <TouchableOpacity onPress={() => navigation.navigate('Main', {phonenumber: el.phonenumber})}key={i} style={styles.deviceContainer}>
             <View style={styles.deviceControlls}>
-              <FontAwesomeIcon icon={faTrash} color={"#ff6347"}/>
-              <FontAwesomeIcon icon={faEdit} color={"#78ceeb"}/>
+              <TouchableOpacity onPress={() => removeItem(i)}>
+              <FontAwesomeIcon icon={faTrash} size={18} color={"#ff6347"}/>
+              </TouchableOpacity>
+               {/*  <FontAwesomeIcon icon={faEdit} color={"#78ceeb"}/> */}
+             
             </View>
-            <Text style={styles.text2}>تست</Text>
-          </View>
-          <View style={styles.deviceContainer}>
-            <View style={styles.deviceControlls}>
-              <FontAwesomeIcon icon={faTrash} color={"#ff6347"}/>
-              <FontAwesomeIcon icon={faEdit} color={"#78ceeb"}/>
-            </View>
-            <Text style={styles.text2}>asd</Text>
-          </View>
-          <View style={styles.deviceContainer}>
-            <View style={styles.deviceControlls}>
-              <FontAwesomeIcon icon={faTrash} color={"#ff6347"}/>
-              <FontAwesomeIcon icon={faEdit} color={"#78ceeb"}/>
-            </View>
-            <Text style={styles.text2}>asd</Text>
-          </View>
+            <Text style={styles.text2}>{el.place}</Text>
+          </TouchableOpacity>
+          )}) : ''}
+          
+         
          
         </View>
         <TouchableOpacity style={styles.newDevice} onPress={() => navigation.navigate('addDevice')}>
-          <Text style={styles.text2}>
+          <Text style={[styles.text2, { color: '#fff'}]}>
             افزودن دستگاه جدید
           </Text>
-          <FontAwesomeIcon icon={faPlus} color={"#2AB461"}/>
+          <FontAwesomeIcon icon={faPlus} color={"#fff"}/>
         </TouchableOpacity>
       </SafeAreaView>
     </>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({  
   text: {fontFamily: 'Vazir-Light', fontSize: 20},
   text2: {fontFamily: 'Vazir-Light', fontSize: 14},
   textBold: {fontFamily: 'Vazir-Medium', fontSize: 16},
@@ -207,16 +172,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 160,
     height: 40,
-    backgroundColor: '#efefef',
+    backgroundColor: '#2AB461',
     borderWidth: 2,
-    borderColor: '#2AB461',
+    borderColor: '#2AB46150',
     bottom: 40,
     left: Dimensions.get('window').width/2 - 80,
     borderRadius: 15,
     elevation: 3,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    color: '#aaa',
     alignItems: 'center',
     padding: 5,
   }

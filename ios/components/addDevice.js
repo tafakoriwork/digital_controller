@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
+  Button,
   Dimensions,
   PermissionsAndroid,
   SafeAreaView,
@@ -19,63 +20,33 @@ import {
   faPlus,
   faMapPin,
   faSimCard,
-  faLock
+  faLock,
 } from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from './Navbar';
 
 const AddDevice = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
-  const requestCameraPermission = async () => {
-    console.log('runm');
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.SEND_SMS,
-        {
-          title: 'Cool Photo AddDevice Camera Permission',
-          message:
-            'Cool Photo AddDevice needs access to your camera ' +
-            'so you can take awesome pictures.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        NativeModules.TAFAKORISMS.sendMsg(
-          '09357578808',
-          "I'm the best developer ever",
-          (err, name) => {
-            console.log(err, name);
-          },
-        );
+
+  const setItem = async (data) => {
+    AsyncStorage.getItem('devices', (err, result) => {
+      const id = [data];
+      if (result !== null) {
+        var newIds = JSON.parse(result).concat(id);
+        AsyncStorage.setItem('devices', JSON.stringify(newIds));
       } else {
-        console.log('Camera permission denied');
+        AsyncStorage.setItem('devices', JSON.stringify(id));
       }
-    } catch (err) {
-      console.warn(err);
-    }
+      navigation.navigate('Devices')
+    });
   };
 
-  const storeData = async value => {
-    try {
-      const jsonValue = value;
-      await AsyncStorage.setItem('@storage_Key', jsonValue);
-    } catch (e) {
-      // saving error
-    }
-  };
-
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@storage_Key');
-      if (value !== null) {
-        console.log(value);
-      }
-    } catch (e) {
-      // error reading value
-    }
-  };
+  const [device, setdevice] = useState({
+    place: null,
+    phonenumber: null,
+    password: null,
+    description: null,
+  });
 
   return (
     <>
@@ -101,29 +72,95 @@ const AddDevice = ({navigation}) => {
           }}></View>
         <View style={styles.AddDevice}>
           <View style={styles.inputContainer}>
-            <TextInput style={styles.input} placeholder={"محل نصب دستگاه"}/>
-            <FontAwesomeIcon icon={faMapPin} size={20} color={"#AFC3D3"}  style={{position: 'absolute', top: 15, left: 20,}}/>
+            <TextInput
+              style={styles.input}
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  place: text,
+                }))
+              }
+              placeholder={'محل نصب دستگاه'}
+            />
+            <FontAwesomeIcon
+              icon={faMapPin}
+              size={20}
+              color={'#AFC3D3'}
+              style={{position: 'absolute', top: 15, left: 20}}
+            />
           </View>
           <View style={styles.inputContainer}>
-            <TextInput style={styles.input} placeholder={"شماره سیم کارت دستگاه"}/>
-            <FontAwesomeIcon icon={faSimCard} size={18} color={"#AFC3D3"}  style={{position: 'absolute', top: 17, left: 20,}}/>
+            <TextInput
+              style={styles.input}
+              keyboardType={'number-pad'}
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  phonenumber: text,
+                }))
+              }
+              placeholder={'شماره سیم کارت دستگاه'}
+            />
+            <FontAwesomeIcon
+              icon={faSimCard}
+              size={18}
+              color={'#AFC3D3'}
+              style={{position: 'absolute', top: 17, left: 20}}
+            />
           </View>
           <View style={styles.inputContainer}>
-            <TextInput style={styles.input} placeholder={"پسورد دستگاه"}/>
-            <FontAwesomeIcon icon={faLock} size={18} color={"#AFC3D3"}  style={{position: 'absolute', top: 15, left: 20,}}/>
+            <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  password: text,
+                }))
+              }
+              style={styles.input}
+              placeholder={'پسورد دستگاه'}
+            />
+            <FontAwesomeIcon
+              icon={faLock}
+              size={18}
+              color={'#AFC3D3'}
+              style={{position: 'absolute', top: 15, left: 20}}
+            />
           </View>
           <View style={styles.inputContainer}>
-            <TextInput multiline={true} style={[styles.input, {height: 200, textAlignVertical: 'top'}]} placeholder={"توضیحات دستگاه"} />
+            <TextInput
+              multiline={true}
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  description: text,
+                }))
+              }
+              style={[styles.input, {height: 200, textAlignVertical: 'top'}]}
+              placeholder={'توضیحات دستگاه'}
+            />
           </View>
-          <View style={[styles.inputContainer, {flexDirection: 'row', justifyContent: 'space-between', backgroundColor: null}]}>
-            <TouchableOpacity style={styles.button}>
-              <Text style={[styles.textBold, {fontSize: 14,color: '#fff'}]}>ذخیره</Text>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                backgroundColor: null,
+              },
+            ]}>
+            <TouchableOpacity style={styles.button} onPress={() => setItem(device)}>
+              <Text style={[styles.textBold, {fontSize: 14, color: '#fff'}]}>
+                ذخیره
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonCancel} onPress={() => navigation.navigate('Devices')}>
-              <Text style={[styles.textBold, {fontSize: 14,color: '#fff'}]}>انصراف</Text>
+            <TouchableOpacity
+              style={styles.buttonCancel}
+              onPress={() => navigation.navigate('Devices')}>
+              <Text style={[styles.textBold, {fontSize: 14, color: '#fff'}]}>
+                انصراف
+              </Text>
             </TouchableOpacity>
           </View>
-         
         </View>
       </SafeAreaView>
     </>
@@ -141,7 +178,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 1,
     borderWidth: 2,
-    borderColor: '#ff555550'
+    borderColor: '#ff555550',
   },
   button: {
     margin: 2,
@@ -153,7 +190,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 1,
     borderWidth: 2,
-    borderColor: '#55ff5550'
+    borderColor: '#55ff5550',
   },
   text: {fontFamily: 'Vazir-Light', fontSize: 20},
   text2: {fontFamily: 'Vazir-Light', fontSize: 14},
@@ -171,7 +208,7 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 16,
-    paddingStart:50,
+    paddingStart: 50,
     fontFamily: 'Vazir-Light',
     paddingEnd: 15,
   },
@@ -196,10 +233,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
   },
-  deviceControlls:{
+  deviceControlls: {
     width: 40,
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   AddDevice: {
     flexDirection: 'column',
@@ -247,7 +284,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#2AB461',
     bottom: 40,
-    left: Dimensions.get('window').width/2 - 80,
+    left: Dimensions.get('window').width / 2 - 80,
     borderRadius: 15,
     elevation: 3,
     flexDirection: 'row',
@@ -255,7 +292,7 @@ const styles = StyleSheet.create({
     color: '#aaa',
     alignItems: 'center',
     padding: 5,
-  }
+  },
 });
 
 export default AddDevice;
