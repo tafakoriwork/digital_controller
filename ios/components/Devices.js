@@ -1,34 +1,27 @@
 import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
-  PermissionsAndroid,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  useColorScheme,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
-
-import {NativeModules} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {
-  faEdit,
-  faTrash,
-  faPlus
-} from '@fortawesome/free-solid-svg-icons';
+import {faEdit, faTrash, faPlus} from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from './Navbar';
 
 const Devices = ({navigation}) => {
-  const [_devices, setdevices] = useState([])
+  const [_devices, setdevices] = useState([]);
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem('devices');
       if (value !== null) {
         return value;
       }
-      return "[]";
+      return '[]';
     } catch (e) {
       // error reading value
     }
@@ -42,8 +35,8 @@ const Devices = ({navigation}) => {
   }
   useEffect(() => {
     getData().then(devices => setdevices(JSON.parse(devices)));
-  }, [_devices])
-  
+  }, [_devices]);
+
   return (
     <>
       <Navbar />
@@ -67,37 +60,64 @@ const Devices = ({navigation}) => {
             marginHorizontal: 25,
           }}></View>
         <View style={styles.devices}>
-          {_devices.length > 0 ? _devices.map((el, i) => {
-            return (
-            <TouchableOpacity onPress={() => navigation.navigate('Main', {phonenumber: el.phonenumber})}key={i} style={styles.deviceContainer}>
-            <View style={styles.deviceControlls}>
-              <TouchableOpacity onPress={() => removeItem(i)}>
-              <FontAwesomeIcon icon={faTrash} size={18} color={"#ff6347"}/>
-              </TouchableOpacity>
-               {/*  <FontAwesomeIcon icon={faEdit} color={"#78ceeb"}/> */}
-             
-            </View>
-            <Text style={styles.text2}>{el.place}</Text>
-          </TouchableOpacity>
-          )}) : ''}
-          
-         
-         
+          {_devices.length > 0
+            ? _devices.map((el, i) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('Main', {phonenumber: el.phonenumber})
+                    }
+                    key={i}
+                    style={styles.deviceContainer}>
+                    <View style={styles.deviceControlls}>
+                      <TouchableOpacity
+                        style={{padding: 5}}
+                        onPress={() => removeItem(i)}>
+                        <FontAwesomeIcon
+                          icon={faTrash}
+                          size={18}
+                          color={'#ff6347'}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={{padding: 5}}
+                        onPress={() =>
+                          navigation.navigate('editDevice', {el, index: i})
+                        }>
+                        <FontAwesomeIcon
+                          icon={faEdit}
+                          size={18}
+                          color={'#9a9aaa'}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.text2}>{el.place}</Text>
+                  </TouchableOpacity>
+                );
+              })
+            : ''}
         </View>
-        <TouchableOpacity style={styles.newDevice} onPress={() => navigation.navigate('addDevice')}>
-          <Text style={[styles.text2, { color: '#fff'}]}>
-            افزودن دستگاه جدید
-          </Text>
-          <FontAwesomeIcon icon={faPlus} color={"#fff"}/>
-        </TouchableOpacity>
+        <TouchableWithoutFeedback
+          onPress={() => navigation.navigate('addDevice')}>
+          <View style={styles.newDevice}>
+            <Text style={[styles.text2, {color: '#fff', marginEnd: 10}]}>
+              افزودن دستگاه جدید
+            </Text>
+            <FontAwesomeIcon
+              icon={faPlus}
+              color={'#fff'}
+              style={{marginEnd: 10}}
+            />
+          </View>
+        </TouchableWithoutFeedback>
       </SafeAreaView>
     </>
   );
 };
 
-const styles = StyleSheet.create({  
+const styles = StyleSheet.create({
   text: {fontFamily: 'Vazir-Light', fontSize: 20},
-  text2: {fontFamily: 'Vazir-Light', fontSize: 14},
+  text2: {fontFamily: 'Vazir-Medium', fontSize: 14},
   textBold: {fontFamily: 'Vazir-Medium', fontSize: 16},
   containerButtonsBtnContainer: {
     flexDirection: 'column',
@@ -120,15 +140,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 5,
-    backgroundColor: '#dfdfdf80',
+    backgroundColor: '#fff',
     alignItems: 'center',
     borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#2AB46180',
     padding: 15,
   },
-  deviceControlls:{
+  deviceControlls: {
     width: 40,
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   devices: {
     flexDirection: 'column',
@@ -141,7 +163,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     maxHeight: 80,
     marginHorizontal: 50,
-    marginTop: 25,
+    marginTop: 40,
     padding: 5,
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -170,20 +192,18 @@ const styles = StyleSheet.create({
   },
   newDevice: {
     position: 'absolute',
-    width: 160,
-    height: 40,
+    width: 200,
+    height: 60,
     backgroundColor: '#2AB461',
-    borderWidth: 2,
-    borderColor: '#2AB46150',
     bottom: 40,
-    left: Dimensions.get('window').width/2 - 80,
+    left: Dimensions.get('window').width / 2 - 100,
     borderRadius: 15,
-    elevation: 3,
+    elevation: 4,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     padding: 5,
-  }
+  },
 });
 
 export default Devices;

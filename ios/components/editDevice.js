@@ -11,13 +11,8 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-
-import {NativeModules} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
-  faEdit,
-  faTrash,
-  faPlus,
   faMapPin,
   faSimCard,
   faLock,
@@ -25,14 +20,16 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from './Navbar';
 
-const AddDevice = ({navigation}) => {
+const EditDevice = (props) => {
   const isDarkMode = useColorScheme() === 'dark';
+const {navigation, route} = props;
 
   const setItem = async (data) => {
     AsyncStorage.getItem('devices', (err, result) => {
       const id = [data];
       if (result !== null) {
-        var newIds = JSON.parse(result).concat(id);
+        var newIds = JSON.parse(result);
+        newIds[route.params.index] = data;
         AsyncStorage.setItem('devices', JSON.stringify(newIds));
       } else {
         AsyncStorage.setItem('devices', JSON.stringify(id));
@@ -42,10 +39,10 @@ const AddDevice = ({navigation}) => {
   };
 
   const [device, setdevice] = useState({
-    place: null,
-    phonenumber: null,
-    password: null,
-    description: null,
+    place: route.params.el.place,
+    phonenumber: route.params.el.phonenumber,
+    password: route.params.el.password,
+    description: route.params.el.description,
   });
 
   return (
@@ -70,10 +67,11 @@ const AddDevice = ({navigation}) => {
             marginTop: 22,
             marginHorizontal: 25,
           }}></View>
-        <View style={styles.AddDevice}>
+        <View style={styles.EditDevice}>
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
+              value={device.place}
               onChangeText={text =>
                 setdevice(prevState => ({
                   ...prevState,
@@ -92,6 +90,8 @@ const AddDevice = ({navigation}) => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
+
+              value={device.phonenumber}
               keyboardType={'number-pad'}
               onChangeText={text =>
                 setdevice(prevState => ({
@@ -116,6 +116,8 @@ const AddDevice = ({navigation}) => {
                   password: text,
                 }))
               }
+
+              value={device.password}
               style={styles.input}
               placeholder={'پسورد دستگاه'}
             />
@@ -129,6 +131,8 @@ const AddDevice = ({navigation}) => {
           <View style={styles.inputContainer}>
             <TextInput
               multiline={true}
+              
+              value={device.description}
               onChangeText={text =>
                 setdevice(prevState => ({
                   ...prevState,
@@ -150,7 +154,7 @@ const AddDevice = ({navigation}) => {
             ]}>
             <TouchableOpacity style={styles.button} onPress={() => setItem(device)}>
               <Text style={[styles.textBold, {fontSize: 14, color: '#fff'}]}>
-                ذخیره
+                ویرایش
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -235,7 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  AddDevice: {
+  EditDevice: {
     flexDirection: 'column',
     marginHorizontal: 25,
     padding: 10,
@@ -292,4 +296,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddDevice;
+export default EditDevice;

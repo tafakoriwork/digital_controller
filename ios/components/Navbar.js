@@ -7,7 +7,7 @@ function Navbar() {
   const navigation = useNavigation();
   return (
     <TouchableOpacity onPress={() => navigation.navigate('Setting')}>
-      <FontAwesomeIcon icon={faBars} color={"#555"} style={styles.barsMenu} size={24}/>
+      <FontAwesomeIcon icon={faBars} color={"#888"} style={styles.barsMenu} size={30}/>
     </TouchableOpacity>
   )
 }
@@ -16,7 +16,7 @@ function Navbar() {
 const styles = StyleSheet.create({
     barsMenu: {
         position: 'absolute',
-        top:15,
+        top:20,
         right: 15,
     }
 });

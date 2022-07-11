@@ -2,18 +2,7 @@ import React from "react";
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 
 function Modal1(props) {
-    const {Component, close} = props;
-    return (
-    <View style={styles.modalContainer}>
-        <TouchableWithoutFeedback onPress={close}>
-            <View style={styles.close}></View>
-        </TouchableWithoutFeedback>
-        <View style={styles.modalBox}>
-            {Component()}
-        </View>
-    </View>);
-}
-
+    const {Component, close, pheight} = props;
 const styles = StyleSheet.create({
     modalContainer: {
         backgroundColor: '#3335',
@@ -27,7 +16,7 @@ const styles = StyleSheet.create({
     },
     modalBox: {
         width: '70%',
-        height: 150,
+        height: pheight,
         backgroundColor: '#eee',
         padding: 10,
         elevation: 1,
@@ -41,5 +30,16 @@ const styles = StyleSheet.create({
         position: 'absolute'
     }
 });
+
+    return (
+    <View style={styles.modalContainer}>
+        <TouchableWithoutFeedback onPress={close}>
+            <View style={styles.close}></View>
+        </TouchableWithoutFeedback>
+        <View style={styles.modalBox}>
+            {Component()}
+        </View>
+    </View>);
+}
 
 export default Modal1;

@@ -225,9 +225,9 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file('Digi.jks')
+            storeFile file('digital_controller.keystore')
             storePassword '7771163777'
-            keyAlias 'key0'
+            keyAlias 'digital_controller'
             keyPassword '7771163777'
         }
     }
