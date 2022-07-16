@@ -22,9 +22,8 @@ function Locker({navigation}) {
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem('@pass');
-     
-        return value;
-     
+
+      return value;
     } catch (e) {
       console.log(e);
     }
@@ -52,8 +51,6 @@ function Locker({navigation}) {
         }}>
         <Text style={{fontFamily: 'Vazir-Medium', fontSize: 18, color: '#a44'}}>
           کلمه عبور اشتباه است!
-
-          
         </Text>
       </View>
     );
@@ -70,24 +67,25 @@ function Locker({navigation}) {
       )}
       <SafeAreaView
         style={{
-          flex: 1,
+          flex: 3,
           flexDirection: 'column',
-          justifyContent: 'flex-start',
-          marginTop: 25,
+          justifyContent: 'space-between',
         }}>
-        <View style={styles.lock}>
-          <Image source={require('./lock.png')} style={styles.image} />
-        </View>
-        <View style={styles.lockInputContainer}>
-          <TextInput
-            style={styles.lockInput}
-            showSoftInputOnFocus={false}
-            placeholder={'رمز ورود را وارد کنید'}
-            value={text}
-          />
-        </View>
-        <View style={styles.lockInputGuide}>
-          <Text style={styles.lockGuide}>رمز پیش فرض: ۱۲۳۴</Text>
+        <View style={{flex: 1}}>
+          <View style={styles.lock}>
+            <Image source={require('./lock.png')} style={styles.image} />
+          </View>
+          <View style={styles.lockInputContainer}>
+            <TextInput
+              style={styles.lockInput}
+              showSoftInputOnFocus={false}
+              placeholder={'رمز ورود را وارد کنید'}
+              value={text}
+            />
+          </View>
+          <View style={styles.lockInputGuide}>
+            <Text style={styles.lockGuide}>رمز پیش فرض: ۱۲۳۴</Text>
+          </View>
         </View>
         <View style={styles.keyContainer}>
           <View style={styles.keyContainerRow}>
@@ -157,8 +155,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     elevation: 3,
     borderColor: '#4FD38680',
-    width: 80,
-    height: 80,
+    width: 70,
+    height: 70,
     borderRadius: 50,
     backgroundColor: '#eee',
     justifyContent: 'center',
@@ -168,15 +166,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    marginVertical: 5,
+    marginVertical: 2,
   },
   keyContainer: {
+    flex: 1.5,
     marginVertical: 20,
     marginHorizontal: 40,
     flexDirection: 'column',
   },
   lock: {
-    marginTop: 25,
+    marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'center',
   },
@@ -190,7 +189,7 @@ const styles = StyleSheet.create({
   },
 
   lockInputContainer: {
-    marginTop: 25,
+    marginTop: 10,
     marginHorizontal: 50,
     flexDirection: 'row',
     justifyContent: 'center',

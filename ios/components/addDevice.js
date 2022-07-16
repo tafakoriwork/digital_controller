@@ -4,6 +4,7 @@ import {
   Dimensions,
   PermissionsAndroid,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -29,6 +30,13 @@ const AddDevice = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const setItem = async (data) => {
+    if(data.phonenumber == null || data.place == null)
+    {
+      if(data.place == null)
+      alert('لطفا محل نصب دستگاه را وارد کنید')
+    else alert('لطفا شماره سیم کارت را وارد کنید')
+    }
+    else{
     AsyncStorage.getItem('devices', (err, result) => {
       const id = [data];
       if (result !== null) {
@@ -39,12 +47,13 @@ const AddDevice = ({navigation}) => {
       }
       navigation.navigate('Devices')
     });
+  }
   };
 
   const [device, setdevice] = useState({
     place: null,
     phonenumber: null,
-    password: null,
+    password: '1234',
     description: null,
   });
 
@@ -70,7 +79,7 @@ const AddDevice = ({navigation}) => {
             marginTop: 22,
             marginHorizontal: 25,
           }}></View>
-        <View style={styles.AddDevice}>
+        <ScrollView style={styles.AddDevice}>
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
@@ -93,13 +102,14 @@ const AddDevice = ({navigation}) => {
             <TextInput
               style={styles.input}
               keyboardType={'number-pad'}
+              maxLength={11}
               onChangeText={text =>
                 setdevice(prevState => ({
                   ...prevState,
                   phonenumber: text,
                 }))
               }
-              placeholder={'شماره سیم کارت دستگاه'}
+              placeholder={'شماره سیم کارت داخل دستگاه'}
             />
             <FontAwesomeIcon
               icon={faSimCard}
@@ -116,7 +126,9 @@ const AddDevice = ({navigation}) => {
                   password: text,
                 }))
               }
+              maxLength={4}
               style={styles.input}
+              keyboardType={'number-pad'}
               placeholder={'پسورد دستگاه'}
             />
             <FontAwesomeIcon
@@ -125,6 +137,11 @@ const AddDevice = ({navigation}) => {
               color={'#AFC3D3'}
               style={{position: 'absolute', top: 15, left: 20}}
             />
+          </View>
+          <View style={{paddingHorizontal: 10}}>
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 10}}>
+              پسورد پیش فرض دستگاه 1234 می باشد در صورت تغییر رمز دستگاه در قسمت پسورد دستگاه ، پسورد جدید را وارد نمایید همچنین سیم کارت ارسال پیامک را انتخاب نمایید
+              </Text>
           </View>
           <View style={styles.inputContainer}>
             <TextInput
@@ -161,7 +178,7 @@ const AddDevice = ({navigation}) => {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </>
   );

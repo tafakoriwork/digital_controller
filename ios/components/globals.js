@@ -3,4 +3,5 @@ module.exports= {
     isOpen: false,
     sim: 1,
     password1: null,
+    password2: null,
 }

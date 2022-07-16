@@ -1,5 +1,7 @@
+import { faInstagram, faInternetExplorer } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React from 'react';
-import {Dimensions, Image, StyleSheet, Text, View} from 'react-native';
+import {Dimensions, Image, StyleSheet, Text,Linking, TouchableOpacity, View} from 'react-native';
 
 //about us
 function AboutUs() {
@@ -10,8 +12,20 @@ function AboutUs() {
         </View>
         <View style={styles.card}>
             <Text style={styles.text}>
-                متن درباره ما و ...
+            برای دریافت کاتالوگ دستگاه و آموزش نصب به سایت زیر مراجعه فرمایید :
             </Text>
+            <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 25}} onPress={() => Linking.openURL("http://www.gsmalarm.ir")}>
+              <FontAwesomeIcon icon={faInternetExplorer} color={'#0088ff'}/>
+            <Text style={[styles.text, {marginHorizontal: 10}]}>
+            WWW.GSMALARM.IR
+            </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}} onPress={() => Linking.openURL("https://www.instagram.com/payronix.iran/")}>
+              <FontAwesomeIcon icon={faInstagram} color={'#aa8800'}/>
+            <Text style={[styles.text, {marginHorizontal: 10}]}>
+            Instagram
+            </Text>
+            </TouchableOpacity>
         </View>
     </View>
   );

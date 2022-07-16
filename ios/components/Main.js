@@ -10,6 +10,7 @@ import React, {useEffect, useState} from 'react';
 import {
   PermissionsAndroid,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -23,9 +24,15 @@ import {
 import {NativeModules} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
+  faCalculator,
+  faClock,
   faCog,
+  faCoins,
+  faContactCard,
+  faExchange,
   faKey,
   faList,
+  faPhone,
   faPhoneSlash,
   faPowerOff,
   faSimCard,
@@ -39,11 +46,32 @@ import globals from './globals';
 
 const Main = props => {
   const {navigation, route} = props;
-  const phonenumber = route.params.phonenumber;
+  const phonenumber = route.params.el.phonenumber;
+  const dvice = route.params.el;
   const [close, setClose] = useState(false);
   const [modal, setModal] = useState(null);
+  const [isSim, setSim] = useState(null);
+  const [dzmsg, setDZMSG] = useState(null);
+  const [rellemsg, setRelleMsg] = useState(null);
+  const [addto, setAddTo] = useState(null);
   const modalCloser = async () => {
     setClose(!close);
+  };
+
+  console.log(dvice);
+
+  const setEditItem = async data => {
+    AsyncStorage.getItem('devices', (err, result) => {
+      const id = [data];
+      if (result !== null) {
+        var newIds = JSON.parse(result);
+        newIds[route.params.index] = data;
+        AsyncStorage.setItem('devices', JSON.stringify(newIds));
+      } else {
+        AsyncStorage.setItem('devices', JSON.stringify(id));
+      }
+      modalCloser();
+    });
   };
 
   const requestSMSPermission = async (phone, msg) => {
@@ -84,6 +112,9 @@ const Main = props => {
         );
 
         ToastAndroid.show('پیام ارسال شد', ToastAndroid.SHORT);
+        setTimeout(() => {
+          ToastAndroid.show('پیام توسط دستگاه دریافت شد', ToastAndroid.SHORT);
+        }, 8000);
       } else {
         console.log('SMS permission denied');
       }
@@ -100,6 +131,111 @@ const Main = props => {
       // saving error
     }
   };
+
+  const setSimcard = async value => {
+    try {
+      globals.sim = String(value);
+      setSim(value);
+      await AsyncStorage.setItem('@sim', String(value));
+    } catch (e) {}
+  };
+
+  const getSimcard = async () => {
+    try {
+      const value = await AsyncStorage.getItem('@sim');
+      if (value) setSim(Number(value));
+      else setSim(Number(1));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  function simChange() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>
+          سیم کارت پیش فرض ارسال پیام را انتخاب کنید
+        </Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              modalCloser;
+              setSim(2);
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor: isSim == 2 ? '#2AB461' : '#aaa',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#666'}]}>
+                سیم کارت ۲
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              modalCloser;
+              setSim(1);
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor: isSim == 1 ? '#2AB461' : '#aaa',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#666'}]}>
+                سیم کارت ۱
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  useEffect(() => {
+    if (!isSim) {
+      getSimcard();
+    }
+    setSimcard(isSim);
+    globals.sim = isSim;
+  }, [isSim]);
+
+  useEffect(() => {
+    globals.password1 = dvice.password;
+  }, [dvice]);
 
   let comp;
 
@@ -145,6 +281,16 @@ const Main = props => {
 
     return (
       <View style={styles.container}>
+        <Text style={[styles.text, {color: '#dc9900'}]}>
+          جهت استعلام شارژ سیم کارت ابتدا صفحه ابتدایی کاتالوگ مطالعه گردد.
+        </Text>
+
+        <View
+          style={{
+            height: 1,
+            backgroundColor: '#aaa5',
+            marginVertical: 0,
+          }}></View>
         <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
         <View style={styles.row}>
           <TouchableOpacity
@@ -252,7 +398,8 @@ const Main = props => {
     return (
       <View style={styles.container}>
         <Text style={[styles.text, {color: '#dc9900'}]}>
-          در صورت عدم آشنایی با حالت نیمه فعال این گزینه را فعال نکنید!
+          در این حالت دستگاه به صورت بی صدا روشن می شود و زون‌های ۱ و ۲ و ۳ و ۷
+          فعال و مابقی زون‌ها غیرفعال می‌شوند.
         </Text>
 
         <View
@@ -261,7 +408,9 @@ const Main = props => {
             backgroundColor: '#aaa5',
             marginVertical: 0,
           }}></View>
-        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <Text style={styles.text}>
+          آیا از فعال سازی دستگاه در این حالت اطمینان دارید؟
+        </Text>
         <View style={styles.row}>
           <TouchableOpacity
             onPress={() => requestSMSPermission(phonenumber, msg)}>
@@ -387,6 +536,111 @@ const Main = props => {
       </View>
     );
   }
+  //silentChangerConfimer enable
+  function silentChangerConfimerEN() {
+    const msg = `*${globals.password1}*33#2#`;
+
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, msg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  //silentChangerConfimer disable
+  function silentChangerConfimerDIS() {
+    const msg = `*${globals.password1}*33#1#`;
+
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, msg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   //add charge
   function addCharge() {
@@ -456,10 +710,23 @@ const Main = props => {
       </View>
     );
   }
+
   //change password
   function changePassword() {
     const msg = password => `*${globals.password1}*2#${password}#`;
-
+    /*  const storePassword = async value => {
+      try {
+        requestSMSPermission(phonenumber, msg(password));
+        await AsyncStorage.setItem('@pass_device', value);
+        globals.password1 = value;
+      } catch (e) {}
+    }; */
+    const storePassword = password => {
+      dvice.password = password;
+      requestSMSPermission(phonenumber, msg(password));
+      globals.password1 = password;
+      setEditItem(dvice);
+    };
     const [password, setpassword] = useState(null);
     const styles = StyleSheet.create({
       container: {
@@ -504,8 +771,388 @@ const Main = props => {
         <View style={{height: 1, backgroundColor: '#aaa5'}}></View>
         <Text style={styles.text}>آیا مایلید رمز جدید ذخیره شود؟</Text>
         <View style={styles.row}>
+          <TouchableOpacity onPress={() => storePassword(password)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+  //silentChanger
+  function silentChanger() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      input: {
+        backgroundColor: '#aaa2',
+        fontFamily: 'Vazir-Medium',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>تنظیمات مورد نظر را انتخاب کنید</Text>
+        <View style={styles.row}>
           <TouchableOpacity
-            onPress={() => requestSMSPermission(phonenumber, msg(password))}>
+            onPress={() => {
+              setModal('silentChangerConfimerEN');
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor: '#2AB461',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#2AB461'}]}>
+                فعال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setModal('silentChangerConfimerDIS');
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor: '#B42A33',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#B42A33'}]}>
+                غیرفعال
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  //delay zone
+  function delayZoneMenu() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      input: {
+        backgroundColor: '#aaa2',
+        fontFamily: 'Vazir-Medium',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>تنظیمات مورد نظر را انتخاب کنید</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setModal('delayZoneExit');
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor: '#2AB461',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#2AB461'}]}>
+                زمان خروج
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setModal('delayZoneEnter');
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor: '#B42A33',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#B42A33'}]}>
+                زمان ورود
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function delayZoneEnter() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        flex: 1,
+      },
+
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        padding: 5,
+        borderColor: '#aaa5',
+        borderRadius: 5,
+        marginTop: 5,
+      },
+
+      row1: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 10,
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      text1: {
+        fontFamily: 'Vazir-Medium',
+        fontSize: 14,
+        textAlign: 'center',
+      },
+
+      btn: {
+        paddingVertical: 5,
+        flex: 1,
+        marginHorizontal: 2,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.row1}>
+          <Text style={[styles.text, {color: '#888', fontSize: 14}]}>
+            تنظیمات زمان ورود
+          </Text>
+        </View>
+
+        <View
+          style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => setModal('delayZoneEnterSend30')}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              انتخاب
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>۳۰ ثانیه</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => setModal('delayZoneEnterSend60')}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              انتخاب
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>۶۰ ثانیه</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  function delayZoneExit() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        flex: 1,
+      },
+
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        padding: 5,
+        borderColor: '#aaa5',
+        borderRadius: 5,
+        marginTop: 5,
+      },
+
+      row1: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 10,
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      text1: {
+        fontFamily: 'Vazir-Medium',
+        fontSize: 14,
+        textAlign: 'center',
+      },
+
+      btn: {
+        paddingVertical: 5,
+        flex: 1,
+        marginHorizontal: 2,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.row1}>
+          <Text style={[styles.text, {color: '#888', fontSize: 14}]}>
+            تنظیمات زمان خروج
+          </Text>
+        </View>
+
+        <View
+          style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => setModal('delayZoneExitSend30')}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              انتخاب
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>۳۰ ثانیه</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => setModal('delayZoneExitSend60')}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              انتخاب
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>۶۰ ثانیه</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  function delayZoneExitSend30() {
+    const msg = `*${globals.password1}*37#1#`;
+
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, msg)}>
             <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
               <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
                 ارسال
@@ -524,11 +1171,250 @@ const Main = props => {
     );
   }
 
-  //change password
-  function relle() {
-    const msg = password => `*${globals.password1}*2#${password}#`;
+  function delayZoneExitSend60() {
+    const msg = `*${globals.password1}*37#2#`;
 
-    const [password, setpassword] = useState(null);
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, msg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function delayZoneEnterSend30() {
+    const msg = `*${globals.password1}*38#1#`;
+
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, msg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function delayZoneEnterSend60() {
+    const msg = `*${globals.password1}*38#2#`;
+
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, msg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  //delay zone
+
+  function relle() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 2,
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+
+      column: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      input: {
+        backgroundColor: '#aaa2',
+        fontFamily: 'Vazir-Medium',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>گزینه مورد نظر را انتخاب کنید</Text>
+        <View style={styles.column}>
+          {/* <TouchableOpacity
+            onPress={() => {
+              setModal('relleRemote');
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor: '#888',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#888'}]}>
+                فرمان با ریموت
+              </Text>
+            </View>
+          </TouchableOpacity> */}
+          <TouchableOpacity
+            onPress={() => {
+              setModal('relleDistance');
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor: '#888',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#888'}]}>
+                فرمان از راه دور
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  //relle distance
+  function relleDistance() {
     const styles = StyleSheet.create({
       container: {
         flexDirection: 'column',
@@ -578,7 +1464,7 @@ const Main = props => {
       <View style={styles.container}>
         <View style={styles.row1}>
           <Text style={[styles.text, {color: '#888', fontSize: 14}]}>
-            خروجی رله ها
+            فرمان از راه دور
           </Text>
         </View>
 
@@ -587,29 +1473,32 @@ const Main = props => {
 
         <View style={styles.row}>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*48##11`)
-            }
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*48#11#`);
+              setModal('relleConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#2AB461'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
               روشن
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*48##10`)
-            }
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*48#10#`);
+              setModal('relleConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
               خاموش
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*48##12`)
-            }
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*48#12#`);
+              setModal('relleConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#00aaff'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
               لحظه‌ای
             </Text>
           </TouchableOpacity>
@@ -620,29 +1509,32 @@ const Main = props => {
 
         <View style={styles.row}>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*48##21`)
-            }
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*48#21#`);
+              setModal('relleConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#2AB461'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
               روشن
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*48##20`)
-            }
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*48#20#`);
+              setModal('relleConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
               خاموش
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*48##22`)
-            }
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*48#22#`);
+              setModal('relleConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#00aaff'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
               لحظه‌ای
             </Text>
           </TouchableOpacity>
@@ -653,29 +1545,32 @@ const Main = props => {
 
         <View style={styles.row}>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*48##31`)
-            }
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*48#31#`);
+              setModal('relleConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#2AB461'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
               روشن
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*48##30`)
-            }
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*48#30#`);
+              setModal('relleConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
               خاموش
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*48##32`)
-            }
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*48#32#`);
+              setModal('relleConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#00aaff'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
               لحظه‌ای
             </Text>
           </TouchableOpacity>
@@ -687,11 +1582,530 @@ const Main = props => {
     );
   }
 
-  //remove remotes
-  function deleteRemotes() {
+  //relle remote
+  function relleRemote() {
     const msg = password => `*${globals.password1}*2#${password}#`;
 
     const [password, setpassword] = useState(null);
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        flex: 1,
+      },
+
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        padding: 5,
+        borderColor: '#aaa5',
+        borderRadius: 5,
+        marginTop: 5,
+      },
+
+      row1: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 10,
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      text1: {
+        fontFamily: 'Vazir-Medium',
+        fontSize: 14,
+        textAlign: 'center',
+      },
+
+      btn: {
+        paddingVertical: 5,
+        flex: 1,
+        marginHorizontal: 2,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.row1}>
+          <Text style={[styles.text, {color: '#888', fontSize: 14}]}>
+            فرمان با ریموت
+          </Text>
+        </View>
+
+        <View
+          style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*32#1#`);
+              setModal('relleConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              انتخاب
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>DOOR در بازکن</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*32#2#`);
+              setModal('relleConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              انتخاب
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>TOGGLE دایم</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setRelleMsg(`*${globals.password1}*32#3#`);
+              setModal('relleConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              انتخاب
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>پروژکتور LIGHT</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  //charge control
+  function relleConfirmer() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, rellemsg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  //end relle
+
+  //delete zone
+  function deleteZone() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        flex: 1,
+      },
+
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        padding: 5,
+        borderColor: '#aaa5',
+        borderRadius: 5,
+        marginTop: 5,
+      },
+
+      row1: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 10,
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      text1: {
+        fontFamily: 'Vazir-Medium',
+        fontSize: 14,
+        textAlign: 'center',
+      },
+
+      btn: {
+        paddingVertical: 5,
+        flex: 1,
+        marginHorizontal: 2,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.row1}>
+          <Text style={[styles.text, {color: '#888', fontSize: 14}]}>
+            حذف زون
+          </Text>
+        </View>
+
+        <View
+          style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*21#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*21#61#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>زون ۱</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*22#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*22#61#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>زون ۲</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*23#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*23#61#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>زون ۳</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*24#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*24#61#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>زون ۴</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*25#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*25#61#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>زون ۵</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*26#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*26#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>زون ۶</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*27#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*27#61#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>زون ۷</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*28#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*28#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>زون ۸</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*29#60#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*29#61#`);
+              setModal('deleteZoneConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>زون ۹</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  //charge control
+  function deleteZoneConfirmer() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.text, {color: '#dc9900'}]}>
+          در صورت حذف زون امنیت دستگاه به پایین ترین حد خود می‌رسد. این گزینه
+          جهت عیب یابی در سنسورها مورد استفاده قرار می‌گیرد.
+        </Text>
+
+        <View
+          style={{
+            height: 1,
+            backgroundColor: '#aaa5',
+            marginVertical: 0,
+          }}></View>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, dzmsg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  //remove remotes
+  function deleteRemotes() {
     const styles = StyleSheet.create({
       container: {
         flexDirection: 'column',
@@ -750,11 +2164,14 @@ const Main = props => {
 
         <View style={styles.row}>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*30##1`)
-            }
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*30#1#`);
+              setModal('dremotesConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>حذف</Text>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              حذف
+            </Text>
           </TouchableOpacity>
           <View style={{flex: 3}}>
             <Text style={styles.text1}>حذف ریموت ۱</Text>
@@ -763,11 +2180,14 @@ const Main = props => {
 
         <View style={styles.row}>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*30##2`)
-            }
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*30#2#`);
+              setModal('dremotesConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>حذف</Text>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              حذف
+            </Text>
           </TouchableOpacity>
           <View style={{flex: 3}}>
             <Text style={styles.text1}>حذف ریموت ۲</Text>
@@ -776,11 +2196,14 @@ const Main = props => {
 
         <View style={styles.row}>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*30##3`)
-            }
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*30#3#`);
+              setModal('dremotesConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>حذف</Text>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              حذف
+            </Text>
           </TouchableOpacity>
           <View style={{flex: 3}}>
             <Text style={styles.text1}>حذف ریموت ۳</Text>
@@ -789,11 +2212,14 @@ const Main = props => {
 
         <View style={styles.row}>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*30##4`)
-            }
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*30#4#`);
+              setModal('dremotesConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>حذف</Text>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              حذف
+            </Text>
           </TouchableOpacity>
           <View style={{flex: 3}}>
             <Text style={styles.text1}>حذف ریموت ۴</Text>
@@ -802,15 +2228,1110 @@ const Main = props => {
 
         <View style={styles.row}>
           <TouchableOpacity
-            onPress={() =>
-              requestSMSPermission(phonenumber, `*${globals.password1}*30##5`)
-            }
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*30#5#`);
+              setModal('dremotesConfirmer');
+            }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
-            <Text style={[styles.text, {fontSize: 8, color: '#fff'}]}>حذف</Text>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              حذف
+            </Text>
           </TouchableOpacity>
           <View style={{flex: 3}}>
             <Text style={styles.text1}>حذف ریموت ۵</Text>
           </View>
+        </View>
+      </View>
+    );
+  }
+
+  function dremotesConfirmer() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, dzmsg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  //software settings
+  function settings() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+
+      btn: {
+        padding: 3,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 2,
+        width: 60,
+      },
+
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 2,
+        borderColor: '#7775',
+        padding: 5,
+        borderRadius: 10,
+        elevation: 1,
+        backgroundColor: '#eee',
+        alignItems: 'center',
+        marginVertical: 2,
+      },
+
+      column: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      text1: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'right',
+        fontSize: 12,
+        color: '#777',
+        marginEnd: 8,
+      },
+
+      input: {
+        backgroundColor: '#aaa2',
+        fontFamily: 'Vazir-Medium',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>تنظیمات نرم افزار</Text>
+        <View style={styles.column}>
+          <View style={styles.row}>
+            <TouchableOpacity
+              onPress={() => {
+                setDZMSG(`*${globals.password1}*46#1#`);
+                setModal('settingsConfirmer');
+              }}
+              style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+                انگلیسی
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setDZMSG(`*${globals.password1}*46#2#`);
+                setModal('settingsConfirmer');
+              }}
+              style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+                فارسی
+              </Text>
+            </TouchableOpacity>
+            <View style={{flex: 3}}>
+              <Text style={styles.text1}>زبان ارسال پیامک</Text>
+            </View>
+          </View>
+
+          <View style={styles.row}>
+            <TouchableOpacity
+              onPress={() => {
+                setDZMSG(`*${globals.password1}*45#2#`);
+                setModal('settingsConfirmer');
+              }}
+              style={[styles.btn, {borderWidth: 2, borderColor: '#00aabb'}]}>
+              <Text style={[styles.text, {fontSize: 10, color: '#00aabb'}]}>
+                همراه‌اول
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setDZMSG(`*${globals.password1}*45#1#`);
+                setModal('settingsConfirmer');
+              }}
+              style={[styles.btn, {borderWidth: 2, borderColor: '#ffd000'}]}>
+              <Text style={[styles.text, {fontSize: 10, color: '#ffd000'}]}>
+                ایرانسل
+              </Text>
+            </TouchableOpacity>
+            <View style={{flex: 3}}>
+              <Text style={styles.text1}>انتخاب اپراتور</Text>
+            </View>
+          </View>
+
+          <View style={styles.row}>
+            <TouchableOpacity
+              onPress={() => {
+                setDZMSG(`*${globals.password1}*35#1#`);
+                setModal('settingsConfirmer');
+              }}
+              style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+                فعال
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setDZMSG(`*${globals.password1}*35#2#`);
+                setModal('settingsConfirmer');
+              }}
+              style={[styles.btn, {borderWidth: 2, borderColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 10, color: '#B42A33'}]}>
+                غیرفعال
+              </Text>
+            </TouchableOpacity>
+            <View style={{flex: 3}}>
+              <Text style={styles.text1}>هشدار قطع برق</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*36#1#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*36#2#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#B42A33'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>هشدار قطع آژیر</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*40#1#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*40#2#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#B42A33'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>گزارش محرمانه</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*43#1#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*43#2#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#B42A33'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>گزارش موجودی سیم‌کارت</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*34#2#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              ۴ دقیقه
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*34#1#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              ۲ دقیقه
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>مدت زمان آژیر</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*44#1#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
+              فعال
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*44#2#`);
+              setModal('settingsConfirmer');
+            }}
+            style={[styles.btn, {borderWidth: 2, borderColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#B42A33'}]}>
+              غیرفعال
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>گزارش تحویل sms</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  //charge control
+  function settingsConfirmer() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, dzmsg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+  //end software settings
+
+  //contact
+  function contactMenu() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 2,
+        borderColor: '#2AB461',
+        padding: 5,
+        borderRadius: 10,
+        backgroundColor: '#eee',
+        alignItems: 'center',
+        marginVertical: 2,
+        width: 270
+      },
+
+      column: {
+        flexDirection: 'column',
+        alignItems: 'center',
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      input: {
+        backgroundColor: '#aaa2',
+        fontFamily: 'Vazir-Medium',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+      },
+
+      text1: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'right',
+        fontSize: 13,
+        color: '#2AB461',
+        marginEnd: 8,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>گزینه مورد نظر را انتخاب کنید</Text>
+        <View style={styles.column}>
+          <TouchableOpacity
+            onPress={() => {
+              setModal('addContact');
+            }}>
+            <View style={styles.row}>
+              <Text style={styles.text1}>اضافه نمودن شماره تلفن</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              setModal('deleteContact');
+            }}>
+            <View style={styles.row}>
+              <Text style={styles.text1}>حذف شماره تلفن از حافظه دستگاه</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              setModal('showContact');
+            }}>
+            <View style={styles.row}>
+              <Text style={styles.text1}>
+                مشاهده شماره تلفن در حافظه دستگاه
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function deleteContact() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        flex: 1,
+      },
+
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        padding: 5,
+        borderColor: '#aaa5',
+        borderRadius: 5,
+        marginTop: 5,
+      },
+
+      row1: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 10,
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      text1: {
+        fontFamily: 'Vazir-Medium',
+        fontSize: 14,
+        textAlign: 'right',
+        marginEnd: 8,
+      },
+
+      btn: {
+        paddingVertical: 5,
+        flex: 1,
+        marginHorizontal: 2,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.row1}>
+          <Text style={[styles.text, {color: '#888', fontSize: 14}]}>
+            حذف شماره تلفن از حافظه دستگاه
+          </Text>
+        </View>
+
+        <View
+          style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*2##`);
+              setModal('contactConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              حذف
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>حذف حافظه ۲</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*3##`);
+              setModal('contactConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              حذف
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>حذف حافظه ۳</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*4##`);
+              setModal('contactConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              حذف
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>حذف حافظه ۴</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*5##`);
+              setModal('contactConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              حذف
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>حذف حافظه ۵</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  function showContact() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        flex: 1,
+      },
+
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        padding: 5,
+        borderColor: '#aaa5',
+        borderRadius: 5,
+        marginTop: 5,
+      },
+
+      row1: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 10,
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      text1: {
+        fontFamily: 'Vazir-Medium',
+        fontSize: 14,
+        textAlign: 'right',
+        marginEnd: 8,
+      },
+
+      btn: {
+        paddingVertical: 5,
+        flex: 1,
+        marginHorizontal: 2,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.row1}>
+          <Text style={[styles.text, {color: '#888', fontSize: 14}]}>
+            مشاهده شماره تلفن در حافظه دستگاه
+          </Text>
+        </View>
+
+        <View
+          style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*2#`);
+              setModal('contactConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              مشاهده
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>مشاهده حافظه ۲</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*3#`);
+              setModal('contactConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              مشاهده
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>مشاهده حافظه ۳</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*4#`);
+              setModal('contactConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              مشاهده
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>مشاهده حافظه ۴</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setDZMSG(`*${globals.password1}*5#`);
+              setModal('contactConfirmer');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              مشاهده
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>مشاهده حافظه ۵</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  function addContact() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        flex: 1,
+      },
+
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        padding: 5,
+        borderColor: '#aaa5',
+        borderRadius: 5,
+        marginTop: 5,
+      },
+
+      row1: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 10,
+      },
+
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      text1: {
+        fontFamily: 'Vazir-Medium',
+        fontSize: 14,
+        textAlign: 'right',
+        marginEnd: 8,
+      },
+
+      btn: {
+        paddingVertical: 5,
+        flex: 1,
+        marginHorizontal: 2,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.row1}>
+          <Text style={[styles.text, {color: '#888', fontSize: 14}]}>
+            افزودن شماره تلفن به حافظه دستگاه
+          </Text>
+        </View>
+
+        <View
+          style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setAddTo(2);
+              setModal('addPhone');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              افزودن
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>افزودن به حافظه ۲</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setAddTo(3);
+              setModal('addPhone');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              افزودن
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>افزودن به حافظه ۳</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setAddTo(4);
+              setModal('addPhone');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              افزودن
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>افزودن به حافظه ۴</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              setAddTo(5);
+              setModal('addPhone');
+            }}
+            style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+            <Text style={[styles.text, {fontSize: 10, color: '#fff'}]}>
+              افزودن
+            </Text>
+          </TouchableOpacity>
+          <View style={{flex: 3}}>
+            <Text style={styles.text1}>افزودن به حافظه ۵</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  function contactConfirmer() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, dzmsg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function addPhone() {
+    const msg = pnumber => `*${globals.password1}*${addto}#${pnumber}#`;
+
+    const [pnumber, setpnumber] = useState(null);
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+
+      input: {
+        backgroundColor: '#aaa2',
+        fontFamily: 'Vazir-Medium',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <TextInput
+          keyboardType={'number-pad'}
+          style={styles.input}
+          onChangeText={text => setpnumber(text)}
+          placeholder="شماره تلفن"
+        />
+        <View style={{height: 1, backgroundColor: '#aaa5'}}></View>
+
+        <Text style={styles.text}>آیا مایلید شماره جدید ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, msg(pnumber))}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+  //end contact
+
+
+  function callerOrder() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>
+          اولویت تلفن کننده
+        </Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => {
+              modalCloser;
+              setModal('callerConfirmer');
+              setDZMSG(`*${globals.password1}*41#2#`);
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor:  '#aaa',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#666'}]}>
+                SMS
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              modalCloser;
+              setModal('callerConfirmer');
+              setDZMSG(`*${globals.password1}*41#1#`);
+            }}>
+            <View
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: '#eee',
+                  borderWidth: 2,
+                  borderColor: '#aaa',
+                },
+              ]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#666'}]}>
+                CALL
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function callerConfirmer() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, dzmsg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -826,6 +3347,33 @@ const Main = props => {
     changePassword,
     relle,
     deleteRemotes,
+    simChange,
+    silentChanger,
+    silentChangerConfimerDIS,
+    silentChangerConfimerEN,
+    delayZoneMenu,
+    delayZoneEnter,
+    delayZoneExit,
+    delayZoneExitSend30,
+    delayZoneExitSend60,
+    delayZoneEnterSend30,
+    delayZoneEnterSend60,
+    deleteZone,
+    deleteZoneConfirmer,
+    relleDistance,
+    relleRemote,
+    relleConfirmer,
+    settings,
+    settingsConfirmer,
+    contactMenu,
+    deleteContact,
+    contactConfirmer,
+    showContact,
+    addContact,
+    addPhone,
+    dremotesConfirmer,
+    callerConfirmer,
+    callerOrder
   };
 
   const heights = {
@@ -836,8 +3384,35 @@ const Main = props => {
     powerswitchOFF: 150,
     powerswitchSOSO: 200,
     changePassword: 200,
-    relle: 200,
     deleteRemotes: 300,
+    simChange: 150,
+    silentChanger: 150,
+    silentChangerConfimerDIS: 150,
+    silentChangerConfimerEN: 150,
+    delayZoneMenu: 150,
+    delayZoneEnter: 170,
+    delayZoneExit: 170,
+    delayZoneExitSend30: 150,
+    delayZoneExitSend60: 150,
+    delayZoneEnterSend30: 150,
+    delayZoneEnterSend60: 150,
+    deleteZone: 460,
+    deleteZoneConfirmer: 200,
+    relle: 160,
+    relleDistance: 190,
+    relleRemote: 200,
+    relleConfirmer: 150,
+    settings: 480,
+    settingsConfirmer: 150,
+    contactMenu: 200,
+    deleteContact: 250,
+    contactConfirmer: 150,
+    showContact: 250,
+    addContact: 250,
+    addPhone: 200,
+    dremotesConfirmer: 150,
+    callerConfirmer: 150,
+    callerOrder: 200
   };
 
   return (
@@ -914,19 +3489,8 @@ const Main = props => {
             </View>
           </TouchableWithoutFeedback>
         </View>
-        <View style={styles.containerButtonsColumn}>
+        <ScrollView style={styles.containerButtonsColumn}>
           <View style={styles.containerButtonsRow}>
-            <View style={styles.containerButtonsBtnContainer}>
-              <TouchableOpacity
-                onPress={() => {
-                  modalCloser();
-                  setModal('relle');
-                }}
-                style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faList} size={26} color={'#2AB461'} />
-              </TouchableOpacity>
-              <Text style={styles.text}>خروجی رله‌ها</Text>
-            </View>
             <View style={styles.containerButtonsBtnContainer}>
               <TouchableOpacity
                 onPress={() => {
@@ -950,34 +3514,30 @@ const Main = props => {
                 }}
                 style={styles.containerButtonsBtn}>
                 <FontAwesomeIcon icon={faSimCard} size={26} color={'#2AB461'} />
+                <FontAwesomeIcon
+                  icon={faCoins}
+                  size={12}
+                  color={'#007700'}
+                  style={{position: 'absolute', top: 20, left: 25}}
+                />
               </TouchableOpacity>
               <Text style={styles.text}>کنترل شارژ</Text>
+            </View>
+
+            <View style={styles.containerButtonsBtnContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  modalCloser();
+                  setModal('relle');
+                }}
+                style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon icon={faList} size={26} color={'#2AB461'} />
+              </TouchableOpacity>
+              <Text style={styles.text}>خروجی رله‌ها</Text>
             </View>
           </View>
 
           <View style={styles.containerButtonsRow}>
-            <View style={styles.containerButtonsBtnContainer}>
-              <TouchableOpacity
-                onPress={() => {
-                  modalCloser();
-                  setModal('changePassword');
-                }}
-                style={styles.containerButtonsBtn}>
-                <FontAwesomeIcon icon={faKey} size={26} color={'#2AB461'} />
-              </TouchableOpacity>
-              <Text style={styles.text}>تغییر رمز دستگاه</Text>
-            </View>
-            <View style={styles.containerButtonsBtnContainer}>
-              <TouchableOpacity
-                style={styles.containerButtonsBtn}
-                onPress={() => {
-                  modalCloser();
-                  setModal('deleteRemotes');
-                }}>
-                <FontAwesomeIcon icon={faTrash} size={26} color={'#2AB461'} />
-              </TouchableOpacity>
-              <Text style={styles.text}>حذف ریموت‌ها</Text>
-            </View>
             <View style={styles.containerButtonsBtnContainer}>
               <TouchableOpacity
                 onPress={() => {
@@ -993,44 +3553,124 @@ const Main = props => {
               </TouchableOpacity>
               <Text style={styles.text}>قطع شماره گیری</Text>
             </View>
+
+            <View style={styles.containerButtonsBtnContainer}>
+              <TouchableOpacity
+                style={styles.containerButtonsBtn}
+                onPress={() => {
+                  modalCloser();
+                  setModal('deleteZone');
+                }}>
+                <FontAwesomeIcon icon={faTrash} size={26} color={'#2AB461'} />
+              </TouchableOpacity>
+              <Text style={styles.text}>حذف زون</Text>
+            </View>
+
+            <View style={styles.containerButtonsBtnContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  modalCloser();
+                  setModal('changePassword');
+                }}
+                style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon icon={faKey} size={26} color={'#2AB461'} />
+              </TouchableOpacity>
+              <Text style={styles.text}>تغییر رمز دستگاه</Text>
+            </View>
           </View>
 
-          <View style={[styles.containerButtonsRow]}>
+          <View style={styles.containerButtonsRow}>
             <View style={styles.containerButtonsBtnContainer}>
               <TouchableOpacity
-                style={[styles.containerButtonsBtn, {opacity: 0}]}>
+                style={styles.containerButtonsBtn}
+                onPress={() => {
+                  modalCloser();
+                  setModal('deleteRemotes');
+                }}>
+                <FontAwesomeIcon icon={faTrash} size={26} color={'#2AB461'} />
                 <FontAwesomeIcon
-                  icon={faFileText}
-                  size={26}
-                  color={'#2AB461'}
+                  icon={faCalculator}
+                  size={12}
+                  color={'#fff'}
+                  style={{position: 'absolute', top: 35, left: 32}}
                 />
               </TouchableOpacity>
-              <Text style={[styles.text, {opacity: 0}]}>درباره ما</Text>
+              <Text style={styles.text}>حذف ریموت‌ها</Text>
             </View>
 
             <View style={styles.containerButtonsBtnContainer}>
               <TouchableOpacity
-                onPress={() => navigation.navigate('AboutUs')}
-                style={styles.containerButtonsBtn}>
+                style={styles.containerButtonsBtn}
+                onPress={() => {
+                  modalCloser();
+                  setModal('contactMenu');
+                }}>
                 <FontAwesomeIcon
-                  icon={faFileText}
+                  icon={faContactCard}
                   size={26}
                   color={'#2AB461'}
                 />
               </TouchableOpacity>
-              <Text style={styles.text}>درباره ما</Text>
+              <Text style={styles.text}>افزودن شماره</Text>
             </View>
 
             <View style={styles.containerButtonsBtnContainer}>
               <TouchableOpacity
-                onPress={() => navigation.navigate('Setting')}
+                onPress={() => {
+                  modalCloser();
+                  setModal('delayZoneMenu');
+                }}
                 style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon icon={faClock} size={26} color={'#2AB461'} />
+              </TouchableOpacity>
+              <Text style={styles.text}>زون تاخیری</Text>
+            </View>
+          </View>
+
+          <View style={styles.containerButtonsRow}>
+            <View style={styles.containerButtonsBtnContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  modalCloser();
+                  setModal('callerOrder');
+                }}
+                style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon icon={faPhone} size={26} color={'#2AB461'} />
+              </TouchableOpacity>
+              <Text style={styles.text}>اولویت تلفن‌کننده </Text>
+            </View>
+
+            <View style={styles.containerButtonsBtnContainer}>
+              <TouchableOpacity
+                style={styles.containerButtonsBtn}
+                onPress={() => {
+                  modalCloser();
+                  setModal('settings');
+                }}>
                 <FontAwesomeIcon icon={faCog} size={26} color={'#2AB461'} />
               </TouchableOpacity>
-              <Text style={styles.text}>تنظیمات نرم افزار</Text>
+              <Text style={styles.text}>تنظیمات</Text>
+            </View>
+
+            <View style={styles.containerButtonsBtnContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  modalCloser();
+                  setModal('simChange');
+                }}
+                style={styles.containerButtonsBtn}>
+                <FontAwesomeIcon icon={faSimCard} size={26} color={'#2AB461'} />
+                <FontAwesomeIcon
+                  icon={faExchange}
+                  size={12}
+                  color={'#007700'}
+                  style={{position: 'absolute', top: 20, left: 25}}
+                />
+              </TouchableOpacity>
+              <Text style={styles.text}>انتخاب سیم‌کارت</Text>
             </View>
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </>
   );
@@ -1048,8 +3688,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#2AB461',
     margin: 10,
-    height: 80,
-    width: 80,
+    height: 70,
+    width: 70,
     borderRadius: 100,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1059,7 +3699,7 @@ const styles = StyleSheet.create({
   containerButtonsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 5,
+    marginBottom: 2,
   },
   containerButtonsColumn: {
     flexDirection: 'column',
@@ -1067,13 +3707,12 @@ const styles = StyleSheet.create({
     borderColor: '#aaa3',
     borderWidth: 1,
     marginVertical: 10,
-    padding: 10,
+    padding: 5,
     borderRadius: 10,
     flex: 3,
   },
   containerBox: {
     backgroundColor: '#eee',
-    height: 150,
     marginHorizontal: 25,
     marginTop: 25,
     padding: 5,
@@ -1082,7 +3721,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 10,
     elevation: 2,
-    flex: 1,
     fontFamily: 'Vazir-Light',
   },
 

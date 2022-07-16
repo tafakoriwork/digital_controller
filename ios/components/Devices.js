@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,9 +13,11 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faEdit, faTrash, faPlus} from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from './Navbar';
+import Modal1 from './Modal1';
 
 const Devices = ({navigation}) => {
   const [_devices, setdevices] = useState([]);
+  const [rmid, setClose] = useState(null);
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem('devices');
@@ -27,11 +30,65 @@ const Devices = ({navigation}) => {
     }
   };
 
+  const toggler = async() => setClose(null);
+
+
+  function removeConfirmer() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>آیا مایلید این دستگاه حذف شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => removeItem(rmid)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={toggler}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   function removeItem(index) {
     const devices = _devices;
     devices.splice(index, 1);
     AsyncStorage.setItem('devices', JSON.stringify(devices));
     setdevices(devices);
+    toggler()
   }
   useEffect(() => {
     getData().then(devices => setdevices(JSON.parse(devices)));
@@ -40,6 +97,7 @@ const Devices = ({navigation}) => {
   return (
     <>
       <Navbar />
+      {rmid != null ? <Modal1 pheight={150} close={toggler} Component={removeConfirmer} /> : null}
       <SafeAreaView
         style={{
           flex: 1,
@@ -59,20 +117,20 @@ const Devices = ({navigation}) => {
             marginTop: 22,
             marginHorizontal: 25,
           }}></View>
-        <View style={styles.devices}>
+        <ScrollView style={styles.devices}>
           {_devices.length > 0
             ? _devices.map((el, i) => {
                 return (
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('Main', {phonenumber: el.phonenumber})
+                      navigation.navigate('Main', {el, index: i})
                     }
                     key={i}
                     style={styles.deviceContainer}>
                     <View style={styles.deviceControlls}>
                       <TouchableOpacity
-                        style={{padding: 5}}
-                        onPress={() => removeItem(i)}>
+                        style={{paddingHorizontal: 5, paddingVertical: 5}}
+                        onPress={() => setClose(i)}>
                         <FontAwesomeIcon
                           icon={faTrash}
                           size={18}
@@ -80,14 +138,14 @@ const Devices = ({navigation}) => {
                         />
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={{padding: 5}}
+                        style={{paddingHorizontal: 10, paddingVertical: 5}}
                         onPress={() =>
                           navigation.navigate('editDevice', {el, index: i})
                         }>
                         <FontAwesomeIcon
                           icon={faEdit}
-                          size={18}
-                          color={'#9a9aaa'}
+                          size={20}
+                          color={'#2AB461'}
                         />
                       </TouchableOpacity>
                     </View>
@@ -96,7 +154,7 @@ const Devices = ({navigation}) => {
                 );
               })
             : ''}
-        </View>
+        </ScrollView>
         <TouchableWithoutFeedback
           onPress={() => navigation.navigate('addDevice')}>
           <View style={styles.newDevice}>
@@ -145,7 +203,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     borderColor: '#2AB46180',
-    padding: 15,
+    paddingHorizontal: 10,
+    paddingVertical:5,
   },
   deviceControlls: {
     width: 40,
@@ -157,7 +216,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 25,
     padding: 10,
     borderRadius: 10,
-    flex: 3,
+    flex: 1,
+    marginBottom: 80,
   },
   containerBox: {
     backgroundColor: '#eee',
@@ -195,7 +255,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 60,
     backgroundColor: '#2AB461',
-    bottom: 40,
+    bottom: 20,
     left: Dimensions.get('window').width / 2 - 100,
     borderRadius: 15,
     elevation: 4,

@@ -11,30 +11,34 @@ import EditDevice from './ios/components/editDevice';
 import {useEffect, useState} from 'react';
 import globals from './ios/components/globals';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { I18nManager } from 'react-native';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  var date1 = new Date('July 11, 2022 01:30:00');
+  var date1 = new Date('July 17, 2022 01:30:00');
   var now = new Date();
 
   if (date1.getTime() < now.getTime()) {
     alert('نسخه دمو غیرفعال شد');
+    return
   }
   const [pass, setPass] = useState(null);
-  const storeData = async value => {
+  const [pass1, setPass1] = useState(null);
+  
+  const setPassApp = async value => {
     try {
       await AsyncStorage.setItem('@pass', value);
     } catch (e) {}
   };
 
-  const getData = async () => {
+  const getPassApp = async () => {
     try {
       const value = await AsyncStorage.getItem('@pass');
       if (!value) {
-        storeData('1234');
-        setPass('1234');
-      } else setPass(value);
+        setPassApp('1234');
+        setPass1('1234');
+        globals.password2 = '1234'
+      } else setPass1(value);
     } catch (e) {
       console.log(e);
     }
@@ -49,11 +53,17 @@ const App = () => {
     }
   };
   useEffect(() => {
-    if (pass == null) {
-      getData();
+    try { 
+      I18nManager.allowRTL(false);
+  } 
+  catch (e) {
+      console.log(e);
+  }
+    if (pass1 == null) {
       getSim();
-    } globals.password1 = pass;
-  }, [pass]);
+      getPassApp();
+    } globals.password2 = pass1;
+  }, [pass, pass1]);
 
   return (
     <NavigationContainer>

@@ -1,8 +1,6 @@
 import {
-  BackHandler,
-  faLock,
-  faSignOut,
-  faSimCard,
+  faFileText,
+  faLock, faTextHeight,
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,19 +15,21 @@ import {
   TextInput,
   ToastAndroid,
 } from 'react-native';
-import { useEffect } from 'react';
 import Modal1 from './Modal1';
 import globals from './globals';
+import { faPagelines } from '@fortawesome/free-brands-svg-icons';
 
 //about us
-function Setting() {
-  const [isSim, setSim] = useState(null);
+function Setting({navigation}) {
+  console.log(navigation);
+  /* const [isSim, setSim] = useState(null); */
   const [modal, setModal] = useState(null);
   const [close, setClose] = useState(false);
   const modalCloser = async () => {
     setClose(!close);
   };
-  const storeData = async value => {
+  
+  /* const setSimcard = async value => {
     try {
       globals.sim = String(value);
       setSim(value);
@@ -37,7 +37,7 @@ function Setting() {
     } catch (e) {}
   };
 
-  const getData = async () => {
+  const getSimcard = async () => {
     try {
       const value = await AsyncStorage.getItem('@sim');
       if(value)
@@ -47,18 +47,18 @@ function Setting() {
     } catch (e) {
       console.log(e);
     }
-  };
+  }; */
 
-  useEffect(() => {
+ /*  useEffect(() => {
     if(!isSim)
     {
-     getData();
+     getSimcard();
     }
-    storeData(isSim);
+    setSimcard(isSim);
       globals.sim = isSim;
-  }, [isSim]);
+  }, [isSim]); */
 
-  function simChange() {
+  /* function simChange() {
 
     const styles = StyleSheet.create({
       container: {
@@ -123,7 +123,7 @@ function Setting() {
         </View>
       </View>
     );
-  }
+  } */
 
   //change password
   function changePassword() {
@@ -131,7 +131,7 @@ function Setting() {
     const savePass = async() => {
         try {
           await AsyncStorage.setItem('@pass', password);
-          globals.password1 = password;
+          globals.password2 = password;
           ToastAndroid.show("با موفقیت ذخیره شد", ToastAndroid.SHORT)
           modalCloser();
         } catch (e) {}
@@ -201,12 +201,12 @@ function Setting() {
   }
 
   const components = {
-    simChange,
+    /* simChange, */
     changePassword,
   };
 
   const heights = {
-    simChange: 150,
+    /* simChange: 150, */
     changePassword: 200,
   };
 
@@ -226,18 +226,18 @@ function Setting() {
         />
       </View>
       <View style={styles.column}>
-        <TouchableOpacity style={styles.item} onPress={() => {modalCloser();setModal('simChange')}}>
+        {/* <TouchableOpacity style={styles.item} onPress={() => {modalCloser();setModal('simChange')}}>
           <Text style={styles.text}>انتخاب سیم کارت</Text>
           <FontAwesomeIcon color={'#2AB461'} icon={faSimCard} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity style={styles.item} onPress={() => {modalCloser();setModal('changePassword')}}>
           <Text style={styles.text}>تغییر رمز نرم افزار</Text>
           <FontAwesomeIcon color={'#2AB461'} icon={faLock} />
         </TouchableOpacity>
-      {/*   <TouchableOpacity style={styles.item}>
-          <Text style={styles.text}>خروج</Text>
-          <FontAwesomeIcon color={'#2AB461'} icon={faSignOut} />
-        </TouchableOpacity> */}
+       <TouchableOpacity style={styles.item} onPress={() => navigation.navigate("AboutUs")}>
+          <Text style={styles.text}>درباره ما</Text>
+          <FontAwesomeIcon color={'#2AB461'} icon={faFileText} />
+        </TouchableOpacity> 
       </View>
     </View>
   );
