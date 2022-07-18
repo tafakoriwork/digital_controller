@@ -368,7 +368,7 @@ const Main = props => {
 
   //so so
   function powerswitchSOSO() {
-    const msg = `*${globals.password1}*61#`;
+    const msg = `*${globals.password1}*62#`;
 
     const styles = StyleSheet.create({
       container: {
@@ -713,7 +713,7 @@ const Main = props => {
 
   //change password
   function changePassword() {
-    const msg = password => `*${globals.password1}*2#${password}#`;
+    const msg = password => `*${globals.password1}*49#${password}#`;
     /*  const storePassword = async value => {
       try {
         requestSMSPermission(phonenumber, msg(password));
@@ -905,6 +905,22 @@ const Main = props => {
     return (
       <View style={styles.container}>
         <Text style={styles.text}>تنظیمات مورد نظر را انتخاب کنید</Text>
+        <View
+          style={{
+            height: 1,
+            backgroundColor: '#aaa5',
+            marginVertical: 0,
+          }}></View>
+        <Text style={[styles.text, {color: '#dc9900'}]}>
+        در صورت عدم آشنایی با عملکرد زون تاخیری این گزینه را فعال ننمایید
+        </Text>
+
+        <View
+          style={{
+            height: 1,
+            backgroundColor: '#aaa5',
+            marginVertical: 0,
+          }}></View>
         <View style={styles.row}>
           <TouchableOpacity
             onPress={() => {
@@ -1948,7 +1964,7 @@ const Main = props => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              setDZMSG(`*${globals.password1}*26#60#`);
+              setDZMSG(`*${globals.password1}*26#61#`);
               setModal('deleteZoneConfirmer');
             }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
@@ -2000,7 +2016,7 @@ const Main = props => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              setDZMSG(`*${globals.password1}*28#60#`);
+              setDZMSG(`*${globals.password1}*28#61#`);
               setModal('deleteZoneConfirmer');
             }}
             style={[styles.btn, {backgroundColor: '#B42A33'}]}>
@@ -3246,7 +3262,7 @@ const Main = props => {
             onPress={() => {
               modalCloser;
               setModal('callerConfirmer');
-              setDZMSG(`*${globals.password1}*41#2#`);
+              setDZMSG(`*${globals.password1}*42#1#`);
             }}>
             <View
               style={[
@@ -3266,7 +3282,7 @@ const Main = props => {
             onPress={() => {
               modalCloser;
               setModal('callerConfirmer');
-              setDZMSG(`*${globals.password1}*41#1#`);
+              setDZMSG(`*${globals.password1}*42#2#`);
             }}>
             <View
               style={[

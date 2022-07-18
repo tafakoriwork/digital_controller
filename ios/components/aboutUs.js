@@ -20,12 +20,12 @@ function AboutUs() {
             WWW.GSMALARM.IR
             </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}} onPress={() => Linking.openURL("https://www.instagram.com/payronix.iran/")}>
+            {/* <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}} onPress={() => Linking.openURL("https://www.instagram.com/payronix.iran/")}>
               <FontAwesomeIcon icon={faInstagram} color={'#aa8800'}/>
             <Text style={[styles.text, {marginHorizontal: 10}]}>
             Instagram
             </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
     </View>
   );
