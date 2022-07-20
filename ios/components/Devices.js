@@ -147,7 +147,7 @@ const Devices = ({navigation}) => {
                           size={20}
                           color={'#2AB461'}
                         />
-                        <Text>Edit</Text>
+                        <Text>تنظیم محل نصب</Text>
                         </View>
                       </TouchableOpacity>
                     </View>
