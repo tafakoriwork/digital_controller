@@ -48,7 +48,6 @@ const {navigation, route} = props;
 
   return (
     <>
-      <Navbar />
       <SafeAreaView
         style={{
           flex: 1,
@@ -251,7 +250,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     maxHeight: 80,
     marginHorizontal: 50,
-    marginTop: 25,
+    marginTop: 5,
     padding: 5,
     justifyContent: 'space-around',
     alignItems: 'center',

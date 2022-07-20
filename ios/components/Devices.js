@@ -96,7 +96,6 @@ const Devices = ({navigation}) => {
 
   return (
     <>
-      <Navbar />
       {rmid != null ? <Modal1 pheight={150} close={toggler} Component={removeConfirmer} /> : null}
       <SafeAreaView
         style={{
@@ -142,11 +141,14 @@ const Devices = ({navigation}) => {
                         onPress={() =>
                           navigation.navigate('editDevice', {el, index: i})
                         }>
+                        <View style={{flexDirection: 'row'}}>
                         <FontAwesomeIcon
                           icon={faEdit}
                           size={20}
                           color={'#2AB461'}
                         />
+                        <Text>Edit</Text>
+                        </View>
                       </TouchableOpacity>
                     </View>
                     <Text style={styles.text2}>{el.place}</Text>
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     maxHeight: 80,
     marginHorizontal: 50,
-    marginTop: 40,
+    marginTop: 20,
     padding: 5,
     justifyContent: 'space-around',
     alignItems: 'center',

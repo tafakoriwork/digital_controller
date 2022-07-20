@@ -15,9 +15,6 @@ function Navbar() {
 
 const styles = StyleSheet.create({
     barsMenu: {
-        position: 'absolute',
-        top:20,
-        right: 15,
     }
 });
 

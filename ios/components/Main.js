@@ -43,6 +43,7 @@ import Navbar from './Navbar';
 import {faCreditCardAlt, faFileText} from '@fortawesome/free-regular-svg-icons';
 import Modal1 from './Modal1';
 import globals from './globals';
+import ModalRed from './ModalRed';
 
 const Main = props => {
   const {navigation, route} = props;
@@ -52,13 +53,18 @@ const Main = props => {
   const [modal, setModal] = useState(null);
   const [isSim, setSim] = useState(null);
   const [dzmsg, setDZMSG] = useState(null);
+  const [redModal, setRedModal] = useState(false);
   const [rellemsg, setRelleMsg] = useState(null);
   const [addto, setAddTo] = useState(null);
+
+  console.log('device', dvice);
   const modalCloser = async () => {
     setClose(!close);
   };
 
-  console.log(dvice);
+  const modalredCloser = async () => {
+    setRedModal(false);
+  };
 
   const setEditItem = async data => {
     AsyncStorage.getItem('devices', (err, result) => {
@@ -113,7 +119,7 @@ const Main = props => {
 
         ToastAndroid.show('پیام ارسال شد', ToastAndroid.SHORT);
         setTimeout(() => {
-          ToastAndroid.show('پیام توسط دستگاه دریافت شد', ToastAndroid.SHORT);
+          setRedModal(true);
         }, 8000);
       } else {
         console.log('SMS permission denied');
@@ -912,7 +918,7 @@ const Main = props => {
             marginVertical: 0,
           }}></View>
         <Text style={[styles.text, {color: '#dc9900'}]}>
-        در صورت عدم آشنایی با عملکرد زون تاخیری این گزینه را فعال ننمایید
+          در صورت عدم آشنایی با عملکرد زون تاخیری این گزینه را فعال ننمایید
         </Text>
 
         <View
@@ -1486,7 +1492,18 @@ const Main = props => {
 
         <View
           style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
-
+<View style={styles.row}>
+        <View style={{flex: 1}}>
+            <Text style={styles.text1}></Text>
+          </View><View style={{flex: 1}}>
+            <Text style={styles.text1}></Text>
+          </View><View style={{flex: 1}}>
+            <Text style={styles.text1}>محل نصب</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Text style={styles.text1}>نام</Text>
+          </View>
+        </View>
         <View style={styles.row}>
           <TouchableOpacity
             onPress={() => {
@@ -1518,7 +1535,10 @@ const Main = props => {
               لحظه‌ای
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.r1}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>رله ۱</Text>
           </View>
         </View>
@@ -1554,7 +1574,10 @@ const Main = props => {
               لحظه‌ای
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.r2}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>رله ۲</Text>
           </View>
         </View>
@@ -1590,7 +1613,10 @@ const Main = props => {
               لحظه‌ای
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.r3}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>رله ۳</Text>
           </View>
         </View>
@@ -1822,6 +1848,18 @@ const Main = props => {
           style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
 
         <View style={styles.row}>
+        <View style={{flex: 1}}>
+            <Text style={styles.text1}></Text>
+          </View><View style={{flex: 1}}>
+            <Text style={styles.text1}></Text>
+          </View><View style={{flex: 1}}>
+            <Text style={styles.text1}>محل نصب</Text>
+          </View>
+          <View style={{flex: 1}}>
+            <Text style={styles.text1}>نام</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
           <TouchableOpacity
             onPress={() => {
               setDZMSG(`*${globals.password1}*21#60#`);
@@ -1842,7 +1880,10 @@ const Main = props => {
               غیرفعال
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.z1}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>زون ۱</Text>
           </View>
         </View>
@@ -1868,7 +1909,10 @@ const Main = props => {
               غیرفعال
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.z2}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>زون ۲</Text>
           </View>
         </View>
@@ -1894,7 +1938,10 @@ const Main = props => {
               غیرفعال
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.z3}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>زون ۳</Text>
           </View>
         </View>
@@ -1920,7 +1967,10 @@ const Main = props => {
               غیرفعال
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.z4}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>زون ۴</Text>
           </View>
         </View>
@@ -1946,7 +1996,10 @@ const Main = props => {
               غیرفعال
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.z5}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>زون ۵</Text>
           </View>
         </View>
@@ -1972,7 +2025,10 @@ const Main = props => {
               غیرفعال
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.z6}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>زون ۶</Text>
           </View>
         </View>
@@ -1998,7 +2054,10 @@ const Main = props => {
               غیرفعال
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.z7}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>زون ۷</Text>
           </View>
         </View>
@@ -2024,7 +2083,10 @@ const Main = props => {
               غیرفعال
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.z8}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>زون ۸</Text>
           </View>
         </View>
@@ -2050,7 +2112,10 @@ const Main = props => {
               غیرفعال
             </Text>
           </TouchableOpacity>
-          <View style={{flex: 3}}>
+          <View style={{flex: 2}}>
+            <Text style={styles.text1}>{dvice.z9}</Text>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={styles.text1}>زون ۹</Text>
           </View>
         </View>
@@ -2179,6 +2244,7 @@ const Main = props => {
           style={{height: 1, backgroundColor: '#aaa5', marginBottom: 5}}></View>
 
         <View style={styles.row}>
+          
           <TouchableOpacity
             onPress={() => {
               setDZMSG(`*${globals.password1}*30#1#`);
@@ -2508,7 +2574,7 @@ const Main = props => {
           <TouchableOpacity
             onPress={() => {
               setDZMSG(`*${globals.password1}*43#1#`);
-              setModal('settingsConfirmer');
+              setModal('settingsConfirmergozaresh');
             }}
             style={[styles.btn, {borderWidth: 2, borderColor: '#2AB461'}]}>
             <Text style={[styles.text, {fontSize: 10, color: '#2AB461'}]}>
@@ -2634,6 +2700,66 @@ const Main = props => {
       </View>
     );
   }
+  function settingsConfirmergozaresh() {
+    const styles = StyleSheet.create({
+      container: {
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        flex: 1,
+      },
+      btn: {
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 10,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      },
+      text: {
+        fontFamily: 'Vazir-Medium',
+        textAlign: 'center',
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.text, {color: '#dc9900'}]}>
+          فقط در صورت استفاده از سیم کارت ایرانسل در داخل دستگاه این گزینه فعال
+          شود
+        </Text>
+
+        <View
+          style={{
+            height: 1,
+            backgroundColor: '#aaa5',
+            marginVertical: 0,
+          }}></View>
+        <Text style={styles.text}>آیا مایلید پیام ارسال شود؟</Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            onPress={() => requestSMSPermission(phonenumber, dzmsg)}>
+            <View style={[styles.btn, {backgroundColor: '#2AB461'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                ارسال
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={modalCloser}>
+            <View style={[styles.btn, {backgroundColor: '#B42A33'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#eee'}]}>
+                انصراف
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
   //end software settings
 
   //contact
@@ -2664,7 +2790,7 @@ const Main = props => {
         backgroundColor: '#eee',
         alignItems: 'center',
         marginVertical: 2,
-        width: 270
+        width: 270,
       },
 
       column: {
@@ -3225,7 +3351,6 @@ const Main = props => {
   }
   //end contact
 
-
   function callerOrder() {
     const styles = StyleSheet.create({
       container: {
@@ -3237,13 +3362,14 @@ const Main = props => {
         paddingHorizontal: 10,
         paddingVertical: 8,
         borderRadius: 10,
-        width: 100,
         justifyContent: 'center',
         alignItems: 'center',
+        width: '80%',
+        marginVertical: 2,
+        marginHorizontal: '10%',
       },
-      row: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
+      column: {
+        flexDirection: 'column',
       },
       text: {
         fontFamily: 'Vazir-Medium',
@@ -3254,10 +3380,8 @@ const Main = props => {
 
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>
-          اولویت تلفن کننده
-        </Text>
-        <View style={styles.row}>
+        <Text style={styles.text}>اولویت تلفن کننده</Text>
+        <View style={styles.column}>
           <TouchableOpacity
             onPress={() => {
               modalCloser;
@@ -3270,10 +3394,10 @@ const Main = props => {
                 {
                   backgroundColor: '#eee',
                   borderWidth: 2,
-                  borderColor:  '#aaa',
+                  borderColor: '#2AB461',
                 },
               ]}>
-              <Text style={[styles.text, {fontSize: 14, color: '#666'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#2AB461'}]}>
                 SMS
               </Text>
             </View>
@@ -3290,10 +3414,10 @@ const Main = props => {
                 {
                   backgroundColor: '#eee',
                   borderWidth: 2,
-                  borderColor: '#aaa',
+                  borderColor: '#2AB461',
                 },
               ]}>
-              <Text style={[styles.text, {fontSize: 14, color: '#666'}]}>
+              <Text style={[styles.text, {fontSize: 14, color: '#2AB461'}]}>
                 CALL
               </Text>
             </View>
@@ -3381,6 +3505,7 @@ const Main = props => {
     relleConfirmer,
     settings,
     settingsConfirmer,
+    settingsConfirmergozaresh,
     contactMenu,
     deleteContact,
     contactConfirmer,
@@ -3389,7 +3514,7 @@ const Main = props => {
     addPhone,
     dremotesConfirmer,
     callerConfirmer,
-    callerOrder
+    callerOrder,
   };
 
   const heights = {
@@ -3412,14 +3537,15 @@ const Main = props => {
     delayZoneExitSend60: 150,
     delayZoneEnterSend30: 150,
     delayZoneEnterSend60: 150,
-    deleteZone: 460,
+    deleteZone: 510,
     deleteZoneConfirmer: 200,
     relle: 160,
-    relleDistance: 190,
+    relleDistance: 240,
     relleRemote: 200,
     relleConfirmer: 150,
     settings: 480,
     settingsConfirmer: 150,
+    settingsConfirmergozaresh: 200,
     contactMenu: 200,
     deleteContact: 250,
     contactConfirmer: 150,
@@ -3428,18 +3554,26 @@ const Main = props => {
     addPhone: 200,
     dremotesConfirmer: 150,
     callerConfirmer: 150,
-    callerOrder: 200
+    callerOrder: 200,
   };
+
+  const RedMessage = () => (
+    <Text style={{fontFamily: 'Vazir-Medium', fontSize: 16, color: 'tomato'}}>
+      پیام توسط دستگاه دریافت شد
+    </Text>
+  );
 
   return (
     <>
-      <Navbar />
       {close && (
         <Modal1
           Component={components[modal]}
           close={modalCloser}
           pheight={heights[modal]}
         />
+      )}
+      {redModal && (
+        <ModalRed Component={RedMessage} close={modalredCloser} pheight={60} />
       )}
       <SafeAreaView
         style={{
@@ -3730,7 +3864,7 @@ const styles = StyleSheet.create({
   containerBox: {
     backgroundColor: '#eee',
     marginHorizontal: 25,
-    marginTop: 25,
+    marginTop: 5,
     padding: 5,
     justifyContent: 'space-around',
     alignItems: 'center',

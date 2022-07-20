@@ -12,6 +12,7 @@ import {useEffect, useState} from 'react';
 import globals from './ios/components/globals';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { I18nManager } from 'react-native';
+import Navbar from './ios/components/Navbar';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -63,27 +64,28 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          headerShown: false,
+          headerRight: () => (<Navbar />)
+          
         }}>
         {globals.isOpen ? (
           <>
-            <Stack.Screen name="Devices" component={Devices} />
-            <Stack.Screen name="Main" component={Main} />
-            <Stack.Screen name="addDevice" component={AddDevice} />
-            <Stack.Screen name="editDevice" component={EditDevice} />
-            <Stack.Screen name="Locker" component={Locker} />
-            <Stack.Screen name="AboutUs" component={AboutUs} />
-            <Stack.Screen name="Setting" component={Setting} />
+            <Stack.Screen name="Devices" component={Devices} options={{title: 'دستگاه ها'}}/>
+            <Stack.Screen name="Main" component={Main} options={{title: 'دزدگیر اماکن'}}/>
+            <Stack.Screen name="addDevice" component={AddDevice} options={{title: 'افزودن دستگاه'}}/>
+            <Stack.Screen name="editDevice" component={EditDevice} options={{title: 'ویرایش دستگاه'}}/>
+            <Stack.Screen name="Locker" component={Locker} options={{headerShown: false}}/>
+            <Stack.Screen name="AboutUs" component={AboutUs} options={{title: 'درباره ما'}}/>
+            <Stack.Screen name="Setting" component={Setting} options={{title: 'تنظیمات'}}/>
           </>
         ) : (
           <>
-            <Stack.Screen name="Locker" component={Locker} />
-            <Stack.Screen name="Devices" component={Devices} />
-            <Stack.Screen name="Main" component={Main} />
-            <Stack.Screen name="addDevice" component={AddDevice} />
-            <Stack.Screen name="editDevice" component={EditDevice} />
-            <Stack.Screen name="AboutUs" component={AboutUs} />
-            <Stack.Screen name="Setting" component={Setting} />
+            <Stack.Screen name="Locker" component={Locker}  options={{headerShown: false}}/>
+            <Stack.Screen name="Devices" component={Devices} options={{title: 'دستگاه ها'}}/>
+            <Stack.Screen name="Main" component={Main} options={{title: 'دزدگیر اماکن'}}/>
+            <Stack.Screen name="addDevice" component={AddDevice} options={{title: 'افزودن دستگاه'}}/>
+            <Stack.Screen name="editDevice" component={EditDevice} options={{title: 'ویرایش دستگاه'}}/>
+            <Stack.Screen name="AboutUs" component={AboutUs} options={{title: 'درباره ما'}}/>
+            <Stack.Screen name="Setting" component={Setting} options={{title: 'تنظیمات'}}/>
           </>
         )}
       </Stack.Navigator>

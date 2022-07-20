@@ -55,11 +55,22 @@ const AddDevice = ({navigation}) => {
     phonenumber: null,
     password: '1234',
     description: null,
+    z1: null,
+    z2: null,
+    z3: null,
+    z4: null,
+    z5: null,
+    z6: null,
+    z7: null,
+    z8: null,
+    z9: null,
+    r1: null,
+    r2: null,
+    r3: null,
   });
 
   return (
     <>
-      <Navbar />
       <SafeAreaView
         style={{
           flex: 1,
@@ -80,7 +91,8 @@ const AddDevice = ({navigation}) => {
             marginHorizontal: 25,
           }}></View>
         <ScrollView style={styles.AddDevice}>
-          <View style={styles.inputContainer}>
+         <View style={{paddingBottom: 50}}>
+         <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
               onChangeText={text =>
@@ -140,8 +152,7 @@ const AddDevice = ({navigation}) => {
           </View>
           <View style={{paddingHorizontal: 10}}>
               <Text style={{fontFamily: 'Vazir-Light', fontSize: 10}}>
-              پسورد پیش فرض دستگاه 1234 می باشد در صورت تغییر رمز دستگاه در قسمت پسورد دستگاه ، پسورد جدید را وارد نمایید همچنین سیم کارت ارسال پیامک را انتخاب نمایید
-              </Text>
+              پسورد پیشفرض دستگاه 1234 میباشد در صورت تغییر رمز دستگاه پسورد جدید را در این قسمت وارد نمایید . همچنین سیم کارت پیشفرض ارسال پیامک را در صورت دو سیم‌کارت بودن گوشی انتخاب نمایید              </Text>
           </View>
           <View style={styles.inputContainer}>
             <TextInput
@@ -156,6 +167,189 @@ const AddDevice = ({navigation}) => {
               placeholder={'توضیحات دستگاه'}
             />
           </View>
+
+
+          <View style={[styles.inputContainer,{paddingHorizontal: 25, paddingVertical: 10, flexDirection: 'column', width: '100%'}]}>
+            <Text style={{textAlign: 'center', fontFamily: 'Vazir-Light', color: '#888', fontSize: 15}}> حذف زون  </Text>
+            
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  z1: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>زون ۱</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  z2: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>زون ۲</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  z3: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>زون ۳</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  z4: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>زون ۴</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  z5: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>زون ۵</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  z6: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>زون ۶</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  z7: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>زون ۷</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  z8: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>زون ۸</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  z9: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>زون ۹</Text>
+            </View>
+
+          </View>
+
+          
+          <View style={[styles.inputContainer,{paddingHorizontal: 25, paddingVertical: 10, flexDirection: 'column', width: '100%'}]}>
+            <Text style={{textAlign: 'center', fontFamily: 'Vazir-Light', color: '#888', fontSize: 15}}>فرمان از راه دور</Text>
+            
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  r1: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>رله ۱</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  r2: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>رله ۲</Text>
+            </View>
+
+            <View style={{flexDirection: 'row', flex: 1,width: '100%', alignItems: 'center', height: 40, marginVertical: 5}}>
+              <TextInput
+              onChangeText={text =>
+                setdevice(prevState => ({
+                  ...prevState,
+                  r3: text,
+                }))
+              }
+              style={[styles.input2, {flex: 2,  borderRadius: 5, borderWidth: 1, borderColor: '#aaa5'}]}
+              placeholder={'محل نصب'}
+            />
+              <Text style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>رله ۳</Text>
+            </View>
+
+
+          </View>
+
+
           <View
             style={[
               styles.inputContainer,
@@ -178,6 +372,7 @@ const AddDevice = ({navigation}) => {
               </Text>
             </TouchableOpacity>
           </View>
+         </View>
         </ScrollView>
       </SafeAreaView>
     </>
@@ -226,6 +421,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Vazir-Light',
     paddingEnd: 15,
   },
+  input2: {
+    fontSize: 14,
+    fontFamily: 'Vazir-Light',
+    paddingHorizontal: 5,
+  },
   containerButtonsBtn: {
     borderWidth: 2,
     borderColor: '#2AB461',
@@ -255,15 +455,16 @@ const styles = StyleSheet.create({
   AddDevice: {
     flexDirection: 'column',
     marginHorizontal: 25,
-    padding: 10,
     borderRadius: 10,
     flex: 3,
+    padding: 10
+
   },
   containerBox: {
     backgroundColor: '#eee',
     maxHeight: 80,
     marginHorizontal: 50,
-    marginTop: 25,
+    marginTop: 5,
     padding: 5,
     justifyContent: 'space-around',
     alignItems: 'center',
