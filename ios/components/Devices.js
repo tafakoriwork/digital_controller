@@ -141,7 +141,7 @@ const Devices = ({navigation}) => {
                         onPress={() =>
                           navigation.navigate('editDevice', {el, index: i})
                         }>
-                        <View style={{flexDirection: 'row'}}>
+                        <View style={{flexDirection: 'row',}}>
                         <FontAwesomeIcon
                           icon={faEdit}
                           size={20}
@@ -209,7 +209,6 @@ const styles = StyleSheet.create({
     paddingVertical:5,
   },
   deviceControlls: {
-    width: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

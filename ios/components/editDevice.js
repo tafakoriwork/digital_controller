@@ -4,28 +4,24 @@ import {
   Dimensions,
   PermissionsAndroid,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   useColorScheme,
   View,
-  
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {
-  faMapPin,
-  faSimCard,
-  faLock,
-} from '@fortawesome/free-solid-svg-icons';
+import {faMapPin, faSimCard, faLock} from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from './Navbar';
 
-const EditDevice = (props) => {
+const EditDevice = props => {
   const isDarkMode = useColorScheme() === 'dark';
-const {navigation, route} = props;
+  const {navigation, route} = props;
 
-  const setItem = async (data) => {
+  const setItem = async data => {
     AsyncStorage.getItem('devices', (err, result) => {
       const id = [data];
       if (result !== null) {
@@ -35,7 +31,7 @@ const {navigation, route} = props;
       } else {
         AsyncStorage.setItem('devices', JSON.stringify(id));
       }
-      navigation.navigate('Devices')
+      navigation.navigate('Devices');
     });
   };
 
@@ -44,6 +40,18 @@ const {navigation, route} = props;
     phonenumber: route.params.el.phonenumber,
     password: route.params.el.password,
     description: route.params.el.description,
+    z1: route.params.el.z1,
+    z2: route.params.el.z2,
+    z3: route.params.el.z3,
+    z4: route.params.el.z4,
+    z5: route.params.el.z5,
+    z6: route.params.el.z6,
+    z7: route.params.el.z7,
+    z8: route.params.el.z8,
+    z9: route.params.el.z9,
+    r1: route.params.el.r1,
+    r2: route.params.el.r2,
+    r3: route.params.el.r3,
   });
 
   return (
@@ -67,105 +75,567 @@ const {navigation, route} = props;
             marginTop: 22,
             marginHorizontal: 25,
           }}></View>
-        <View style={styles.EditDevice}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={device.place}
-              onChangeText={text =>
-                setdevice(prevState => ({
-                  ...prevState,
-                  place: text,
-                }))
-              }
-              placeholder={'محل نصب دستگاه'}
-            />
-            <FontAwesomeIcon
-              icon={faMapPin}
-              size={20}
-              color={'#AFC3D3'}
-              style={{position: 'absolute', top: 15, left: 20}}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
+        <ScrollView style={styles.EditDevice}>
+          <View style={{paddingBottom: 50}}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                value={device.place}
+                onChangeText={text =>
+                  setdevice(prevState => ({
+                    ...prevState,
+                    place: text,
+                  }))
+                }
+                placeholder={'محل نصب دستگاه'}
+              />
+              <FontAwesomeIcon
+                icon={faMapPin}
+                size={20}
+                color={'#AFC3D3'}
+                style={{position: 'absolute', top: 15, left: 20}}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                value={device.phonenumber}
+                keyboardType={'number-pad'}
+                onChangeText={text =>
+                  setdevice(prevState => ({
+                    ...prevState,
+                    phonenumber: text,
+                  }))
+                }
+                placeholder={'شماره سیم کارت دستگاه'}
+              />
+              <FontAwesomeIcon
+                icon={faSimCard}
+                size={18}
+                color={'#AFC3D3'}
+                style={{position: 'absolute', top: 17, left: 20}}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                onChangeText={text =>
+                  setdevice(prevState => ({
+                    ...prevState,
+                    password: text,
+                  }))
+                }
+                value={device.password}
+                style={styles.input}
+                placeholder={'پسورد دستگاه'}
+              />
+              <FontAwesomeIcon
+                icon={faLock}
+                size={18}
+                color={'#AFC3D3'}
+                style={{position: 'absolute', top: 15, left: 20}}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                multiline={true}
+                value={device.description}
+                onChangeText={text =>
+                  setdevice(prevState => ({
+                    ...prevState,
+                    description: text,
+                  }))
+                }
+                style={[styles.input, {height: 200, textAlignVertical: 'top'}]}
+                placeholder={'توضیحات دستگاه'}
+              />
+            </View>
 
-              value={device.phonenumber}
-              keyboardType={'number-pad'}
-              onChangeText={text =>
-                setdevice(prevState => ({
-                  ...prevState,
-                  phonenumber: text,
-                }))
-              }
-              placeholder={'شماره سیم کارت دستگاه'}
-            />
-            <FontAwesomeIcon
-              icon={faSimCard}
-              size={18}
-              color={'#AFC3D3'}
-              style={{position: 'absolute', top: 17, left: 20}}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              onChangeText={text =>
-                setdevice(prevState => ({
-                  ...prevState,
-                  password: text,
-                }))
-              }
+            <View
+              style={[
+                styles.inputContainer,
+                {
+                  paddingHorizontal: 25,
+                  paddingVertical: 10,
+                  flexDirection: 'column',
+                  width: '100%',
+                },
+              ]}>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontFamily: 'Vazir-Light',
+                  color: '#888',
+                  fontSize: 15,
+                }}>
+                {' '}
+                حذف زون{' '}
+              </Text>
 
-              value={device.password}
-              style={styles.input}
-              placeholder={'پسورد دستگاه'}
-            />
-            <FontAwesomeIcon
-              icon={faLock}
-              size={18}
-              color={'#AFC3D3'}
-              style={{position: 'absolute', top: 15, left: 20}}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              multiline={true}
+              <View
               
-              value={device.description}
-              onChangeText={text =>
-                setdevice(prevState => ({
-                  ...prevState,
-                  description: text,
-                }))
-              }
-              style={[styles.input, {height: 200, textAlignVertical: 'top'}]}
-              placeholder={'توضیحات دستگاه'}
-            />
-          </View>
-          <View
-            style={[
-              styles.inputContainer,
-              {
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                backgroundColor: null,
-              },
-            ]}>
-            <TouchableOpacity style={styles.button} onPress={() => setItem(device)}>
-              <Text style={[styles.textBold, {fontSize: 14, color: '#fff'}]}>
-                ویرایش
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                value={device.z1}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      z1: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  زون ۱
+                </Text>
+              </View>
+
+              <View
+              
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                value={device.z2}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      z2: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  زون ۲
+                </Text>
+              </View>
+
+              <View
+              
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                value={device.z3}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      z3: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  زون ۳
+                </Text>
+              </View>
+
+              <View
+            
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                  value={device.z4}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      z4: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  زون ۴
+                </Text>
+              </View>
+
+              <View
+             
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                 value={device.z5}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      z5: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  زون ۵
+                </Text>
+              </View>
+
+              <View
+            
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                  value={device.z6}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      z6: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  زون ۶
+                </Text>
+              </View>
+
+              <View
+           
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                   value={device.z7}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      z7: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  زون ۷
+                </Text>
+              </View>
+
+              <View
+              
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                value={device.z8}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      z8: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  زون ۸
+                </Text>
+              </View>
+
+              <View
+              
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                value={device.z9}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      z9: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  زون ۹
+                </Text>
+              </View>
+            </View>
+
+            <View
+              style={[
+                styles.inputContainer,
+                {
+                  paddingHorizontal: 25,
+                  paddingVertical: 10,
+                  flexDirection: 'column',
+                  width: '100%',
+                },
+              ]}>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontFamily: 'Vazir-Light',
+                  color: '#888',
+                  fontSize: 15,
+                }}>
+                فرمان از راه دور
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.buttonCancel}
-              onPress={() => navigation.navigate('Devices')}>
-              <Text style={[styles.textBold, {fontSize: 14, color: '#fff'}]}>
-                انصراف
-              </Text>
-            </TouchableOpacity>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                value={device.r1}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      r1: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  رله ۱
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                value={device.r2}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      r2: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  رله ۲
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  alignItems: 'center',
+                  height: 40,
+                  marginVertical: 5,
+                }}>
+                <TextInput
+                value={device.r3}
+                  onChangeText={text =>
+                    setdevice(prevState => ({
+                      ...prevState,
+                      r3: text,
+                    }))
+                  }
+                  style={[
+                    styles.input2,
+                    {
+                      flex: 2,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#aaa5',
+                    },
+                  ]}
+                  placeholder={'محل نصب'}
+                />
+                <Text
+                  style={{fontFamily: 'Vazir-Light', fontSize: 14, flex: 1}}>
+                  رله ۳
+                </Text>
+              </View>
+            </View>
+
+            <View
+              style={[
+                styles.inputContainer,
+                {
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  backgroundColor: null,
+                },
+              ]}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => setItem(device)}>
+                <Text style={[styles.textBold, {fontSize: 14, color: '#fff'}]}>
+                  ویرایش
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.buttonCancel}
+                onPress={() => navigation.navigate('Devices')}>
+                <Text style={[styles.textBold, {fontSize: 14, color: '#fff'}]}>
+                  انصراف
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </>
   );
@@ -181,7 +651,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
-    
   },
   button: {
     margin: 2,
@@ -245,6 +714,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     flex: 3,
+  },
+  input2: {
+    fontSize: 14,
+    fontFamily: 'Vazir-Light',
+    paddingHorizontal: 5,
   },
   containerBox: {
     backgroundColor: '#eee',
