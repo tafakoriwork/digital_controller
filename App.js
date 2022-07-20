@@ -15,13 +15,7 @@ import { I18nManager } from 'react-native';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  var date1 = new Date('July 21, 2022 01:30:00');
-  var now = new Date();
-
-  if (date1.getTime() < now.getTime()) {
-    alert('نسخه دمو غیرفعال شد');
-    return
-  }
+ 
   const [pass, setPass] = useState(null);
   const [pass1, setPass1] = useState(null);
   
